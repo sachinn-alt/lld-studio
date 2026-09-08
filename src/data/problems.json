@@ -1,0 +1,215 @@
+[
+  {
+    "id": "prob-parking-lot",
+    "title": "Multi-Floor Smart Parking Lot System",
+    "difficulty": "Medium",
+    "estimatedTime": "30 mins",
+    "summary": "Design an automated multi-floor parking lot with dynamic spot allocation, tiered vehicle types, dynamic fee calculation, and multi-gate entry/exit.",
+    "functionalRequirements": [
+      "The parking lot has multiple floors, each containing different parking spot types: Compact, Regular, Large, and Electric Vehicle (EV).",
+      "Supports multiple vehicle types: Motorcycle (Compact), Car (Regular), Truck/Bus (Large), and EV Car (EV spot with charging).",
+      "Dynamic Spot Allocation: Supports configurable assignment strategies (e.g., Nearest to Entry, Lowest Floor First).",
+      "Entry Gate: Issues an immutable parking ticket recording entry timestamp, allocated spot ID, vehicle number, and gate ID.",
+      "Exit Gate: Reads the ticket, calculates the fee based on vehicle type and duration (hourly + peak rate), processes payment, and frees the spot.",
+      "Display Board: Each floor displays real-time available spots per spot type."
+    ],
+    "nonFunctionalRequirements": [
+      "Thread safety: Multiple entry gates cannot allocate the same parking spot simultaneously.",
+      "Extensibility: Adding a new vehicle type (e.g., Heavy Commercial) or new spot strategy must not require rewriting existing parking manager logic (Open-Closed Principle).",
+      "High Cohesion: Separation of fee calculation, ticket lifecycle, and physical spot allocation."
+    ],
+    "rubric": {
+      "id": "rubric-parking-lot",
+      "criteria": [
+        {
+          "id": "domain-modeling",
+          "name": "Domain Modeling & Entity Decomposition",
+          "description": "Decomposes the problem into clean domain entities (Floor, Spot, Vehicle, Ticket, Gate) without leaky abstractions.",
+          "weight": 25,
+          "maxScore": 5
+        },
+        {
+          "id": "single-responsibility",
+          "name": "Single Responsibility & Cohesion",
+          "description": "Classes have focused responsibilities; avoids God classes (e.g., ParkingLot does not calculate fees, print receipts, and manage locks directly).",
+          "weight": 25,
+          "maxScore": 5
+        },
+        {
+          "id": "coupling-and-patterns",
+          "name": "Coupling & Design Patterns",
+          "description": "Effective abstraction using Strategy pattern for Spot Assignment & Pricing, Factory pattern for Spots/Vehicles, and Observer for Display Board.",
+          "weight": 25,
+          "maxScore": 5
+        },
+        {
+          "id": "extensibility-and-tradeoffs",
+          "name": "Extensibility, Concurrency & Trade-offs",
+          "description": "Sound reasoning around concurrent spot booking, race conditions, edge cases (lost ticket, full lot), and design trade-offs.",
+          "weight": 25,
+          "maxScore": 5
+        }
+      ]
+    },
+    "starterTemplate": {
+      "entities": [
+        { "name": "ParkingLot", "responsibility": "Top-level coordinator holding floors and gates" },
+        { "name": "ParkingFloor", "responsibility": "Manages spots of various types on a specific floor" },
+        { "name": "ParkingSpot", "responsibility": "Represents physical slot with status (FREE, OCCUPIED)" },
+        { "name": "Vehicle", "responsibility": "Abstract base vehicle with license plate and vehicle type" },
+        { "name": "ParkingTicket", "responsibility": "Immutable record of vehicle entry, spot, and timestamp" }
+      ],
+      "interfaces": [
+        { "name": "IParkingStrategy", "methods": ["findSpot(VehicleType type, List<ParkingFloor> floors): Optional<ParkingSpot>"] },
+        { "name": "IFeeCalculationStrategy", "methods": ["calculateFee(ParkingTicket ticket, DateTime exitTime): Money"] },
+        { "name": "IDisplayBoardObserver", "methods": ["onSpotStatusChanged(FloorId floor, SpotType type, int availableCount): void"] }
+      ],
+      "designPatterns": [
+        { "name": "Strategy Pattern", "justification": "Allows swapping spot allocation algorithms (Nearest vs Lowest Floor) without modifying ParkingLot" },
+        { "name": "Factory Pattern", "justification": "Decouples instantiation of various spot types and vehicles" }
+      ],
+      "tradeOffsAndAssumptions": "Assuming centralized in-memory lock per floor for spot reservation to prevent double allocation. Tickets are immutable once issued."
+    }
+  },
+  {
+    "id": "prob-elevator-system",
+    "title": "Multi-Car Elevator Dispatcher System",
+    "difficulty": "Hard",
+    "estimatedTime": "35 mins",
+    "summary": "Design a control system for a high-rise building with multiple elevator cars, handling internal floor selections and external hall calls with optimal dispatching.",
+    "functionalRequirements": [
+      "Building has N floors and M elevator cars.",
+      "External Hall Panels: Passengers on any floor can press UP or DOWN call buttons.",
+      "Internal Car Panels: Passengers inside a car can select destination floors, trigger door open/close, and press emergency stop.",
+      "Elevator Dispatcher: Orchestrates hall calls and assigns the most optimal elevator car based on direction, distance, and current load.",
+      "Car States: Cars transition between IDLE, MOVING_UP, MOVING_DOWN, DOOR_OPEN, and MAINTENANCE.",
+      "Safety Constraints: Weight sensor prevents moving if overloaded; emergency stop overrides dispatch instructions."
+    ],
+    "nonFunctionalRequirements": [
+      "Extensibility: Dispatch algorithm (SCAN/LOOK vs Nearest Car vs Energy-Saving) must be swappable without altering car mechanics.",
+      "State Integrity: Elevator cannot transition directly from MOVING_UP to DOOR_OPEN without stopping.",
+      "Testability: Elevator movement and dispatch decisions can be simulated deterministically."
+    ],
+    "rubric": {
+      "id": "rubric-elevator",
+      "criteria": [
+        {
+          "id": "state-management",
+          "name": "State Management & Transitions",
+          "description": "Uses State pattern or clear finite state machine to manage elevator car life cycle and safety invariants.",
+          "weight": 25,
+          "maxScore": 5
+        },
+        {
+          "id": "dispatcher-abstraction",
+          "name": "Dispatcher Decoupling & Strategy",
+          "description": "Dispatcher strategy is cleanly isolated from physical car hardware interfaces and panel events.",
+          "weight": 25,
+          "maxScore": 5
+        },
+        {
+          "id": "request-modeling",
+          "name": "Request & Event Modeling",
+          "description": "Distinguishes between internal destination requests and external hall calls with clear prioritization.",
+          "weight": 25,
+          "maxScore": 5
+        },
+        {
+          "id": "concurrency-and-safety",
+          "name": "Concurrency, Edge Cases & Trade-offs",
+          "description": "Addresses starvation of opposing-direction floors, load limits, emergency stops, and thread safety.",
+          "weight": 25,
+          "maxScore": 5
+        }
+      ]
+    },
+    "starterTemplate": {
+      "entities": [
+        { "name": "ElevatorController", "responsibility": "High-level coordinator of all elevator cars and dispatcher" },
+        { "name": "ElevatorCar", "responsibility": "Represents an individual elevator cabin with state, capacity, and current floor" },
+        { "name": "HallButton", "responsibility": "External floor button to request UP or DOWN ride" },
+        { "name": "ElevatorRequest", "responsibility": "Encapsulates source floor, destination floor, and timestamp" }
+      ],
+      "interfaces": [
+        { "name": "IDispatchStrategy", "methods": ["selectBestCar(List<ElevatorCar> cars, ElevatorRequest request): ElevatorCar"] },
+        { "name": "IElevatorState", "methods": ["move(ElevatorCar car): void", "openDoor(ElevatorCar car): void", "stop(ElevatorCar car): void"] }
+      ],
+      "designPatterns": [
+        { "name": "State Pattern", "justification": "Encapsulates behavior for IDLE, MOVING_UP, MOVING_DOWN, and DOOR_OPEN states" },
+        { "name": "Strategy Pattern", "justification": "Permits plugging different scheduling algorithms (LOOK / SCAN / FCFS)" }
+      ],
+      "tradeOffsAndAssumptions": "Chose LOOK algorithm over FCFS to minimize wait times and motor wear. Assumes elevator floor arrival triggers an event loop tick."
+    }
+  },
+  {
+    "id": "prob-splitwise",
+    "title": "Expense Sharing & Debt Settlement System (Splitwise)",
+    "difficulty": "Medium",
+    "estimatedTime": "30 mins",
+    "summary": "Design an expense sharing system supporting split strategies (Equal, Exact, Percentage), balance sheet maintenance, and debt simplification.",
+    "functionalRequirements": [
+      "Users can create expenses and split them among group members or individual friends.",
+      "Multiple Split Types: Supports EQUAL (split equally), EXACT (specific currency amounts), and PERCENT (percentage of total).",
+      "Validation: Ensure sum of exact splits equals total amount; ensure percentages sum to 100%.",
+      "Balance Sheet: Tracks who owes whom how much across all transactions.",
+      "Debt Simplification: Minimizes the total number of monetary transactions required to settle all debts in a group.",
+      "Settlement: Record debt clearance payments between two users."
+    ],
+    "nonFunctionalRequirements": [
+      "Extensibility: Adding a new split type (e.g., By Shares or Dynamic Ratios) must be pluggable via Strategy pattern without altering ExpenseService.",
+      "Financial Precision: Eliminates floating-point rounding errors using integer cents or high-precision currency types.",
+      "Auditability: Historical transactions are immutable; payments append new settlement records."
+    ],
+    "rubric": {
+      "id": "rubric-splitwise",
+      "criteria": [
+        {
+          "id": "split-strategy-pattern",
+          "name": "Split Strategy & Polymorphism",
+          "description": "Applies Strategy pattern for split calculations, keeping validation rules cohesive within each strategy.",
+          "weight": 25,
+          "maxScore": 5
+        },
+        {
+          "id": "balance-sheet-cohesion",
+          "name": "Balance Sheet & Debt Modeling",
+          "description": "Models pairwise balances cleanly without tightly coupling user accounts to raw expense logs.",
+          "weight": 25,
+          "maxScore": 5
+        },
+        {
+          "id": "financial-precision-and-validation",
+          "name": "Precision, Invariants & Edge Cases",
+          "description": "Handles rounding cents (e.g. $100 split 3 ways), zero-value splits, and atomic balance updates.",
+          "weight": 25,
+          "maxScore": 5
+        },
+        {
+          "id": "settlement-and-extensibility",
+          "name": "Settlement Graph & Extensibility",
+          "description": "Isolates the debt simplification algorithm behind a clear interface, allowing alternative graph solvers.",
+          "weight": 25,
+          "maxScore": 5
+        }
+      ]
+    },
+    "starterTemplate": {
+      "entities": [
+        { "name": "User", "responsibility": "Represents user identity and reference to personal balance sheet" },
+        { "name": "Group", "responsibility": "Logical grouping of users sharing recurring expenses" },
+        { "name": "Expense", "responsibility": "Encapsulates payer, total amount, split strategy, and individual split shares" },
+        { "name": "Split", "responsibility": "Value object representing a single user's monetary share in an expense" },
+        { "name": "BalanceSheet", "responsibility": "Maintains net balances owed to and from other users" }
+      ],
+      "interfaces": [
+        { "name": "ISplitStrategy", "methods": ["validate(double totalAmount, List<Split> splits): boolean", "calculateShares(double totalAmount, List<Split> splits): void"] },
+        { "name": "IDebtSimplifier", "methods": ["simplifyDebts(Map<String, Map<String, Double>> balances): List<SettlementTransaction>"] }
+      ],
+      "designPatterns": [
+        { "name": "Strategy Pattern", "justification": "Permits adding new split rules (Equal, Exact, Percent, Share-based) without altering the Expense entity" },
+        { "name": "Factory Pattern", "justification": "Creates the appropriate ISplitStrategy instance based on split type enum" }
+      ],
+      "tradeOffsAndAssumptions": "Amounts stored in integer cents to prevent floating point inaccuracies. Debt simplification uses a greedy net-balance min-cash-flow approach."
+    }
+  }
+]
