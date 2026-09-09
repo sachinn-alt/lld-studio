@@ -28,10 +28,9 @@ This platform solves **one clear learner problem exceptionally well**:
 ```
 lld-practice-platform/
 ├── docs/
-│   ├── RESEARCH_NOTE.md            # 2-page deep dive on learner problem & market gaps
-│   ├── RESEARCH_NOTE.pdf           # Publication-grade PDF for Google Form submission
-│   ├── DESIGN_NOTE.md              # Domain architecture, UML diagrams, patterns, trade-offs
-│   └── DESIGN_NOTE.pdf             # Publication-grade PDF for Google Form submission
+│   ├── RESEARCH_NOTE.md            # Formal Research Note on learner problem & market gaps
+│   ├── DESIGN_NOTE.md              # Formal Architecture & LLD Specification (DDD, SOLID, UML)
+│   └── README_AI_USAGE.md          # Consolidated Documentation, Limitations & AI Report
 ├── src/
 │   ├── api/
 │   │   └── routes.ts               # REST API endpoints (Problems, Attempts, Submissions, History)
@@ -124,12 +123,11 @@ Alternatively, run them in separate terminals:
 
 Open your browser at: **`http://localhost:5173`**
 
-### 4. Re-generate PDF Deliverables
-To compile `docs/RESEARCH_NOTE.md` and `docs/DESIGN_NOTE.md` into clean PDFs:
-```bash
-npm run generate:docs
-```
-Output files will be generated in `docs/RESEARCH_NOTE.pdf` and `docs/DESIGN_NOTE.pdf`.
+### 4. Documentation Specifications
+All system architecture and design documentation is formatted in publication-grade GitHub Flavored Markdown:
+* **Research Note (Learner Problem & Market Gaps)**: [`docs/RESEARCH_NOTE.md`](./docs/RESEARCH_NOTE.md)
+* **Design Note (Domain Architecture & Extensibility)**: [`docs/DESIGN_NOTE.md`](./docs/DESIGN_NOTE.md)
+* **Consolidated Documentation & AI Usage Report**: [`docs/README_AI_USAGE.md`](./docs/README_AI_USAGE.md)
 
 ---
 
@@ -173,8 +171,9 @@ See [`AI_USAGE.md`](./AI_USAGE.md) for 4 detailed logs of AI-assisted decisions,
 
 ## 📄 Submission Checklist for Hiring Team
 
-* [x] **Research Note (PDF)**: Available at `docs/RESEARCH_NOTE.pdf`
-* [x] **Design Note (PDF)**: Available at `docs/DESIGN_NOTE.pdf`
-* [x] **Working Prototype / GitHub Repo**: Complete runnable TypeScript project
+* [x] **Research Note (Formal Markdown)**: Available at [docs/RESEARCH_NOTE.md](file:///f:/LLD/docs/RESEARCH_NOTE.md)
+* [x] **Design Note (Formal Architecture & LLD)**: Available at [docs/DESIGN_NOTE.md](file:///f:/LLD/docs/DESIGN_NOTE.md)
+* [x] **Consolidated Documentation & AI Usage**: Available at [docs/README_AI_USAGE.md](file:///f:/LLD/docs/README_AI_USAGE.md)
+* [x] **Working Prototype / GitHub Repo**: Complete runnable TypeScript project at [https://github.com/sachinn-alt/lld-studio](https://github.com/sachinn-alt/lld-studio)
 * [x] **Automated Tests**: 12 comprehensive unit & integration tests passing (`npm test`)
-* [x] **README + AI_USAGE.md**: Available at `README.md` and `AI_USAGE.md`
+* [x] **AI Usage Report**: Available at [AI_USAGE.md](file:///f:/LLD/AI_USAGE.md) (Section 6 compliant)

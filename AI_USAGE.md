@@ -1,9 +1,13 @@
 # AI Usage Report: Architectural Decisions & Engineering Judgment
 
-**Platform:** LLD Practice Platform  
-**Author:** Candidate  
-**Date:** September 2026  
-**Assignment Requirement:** Section 6 (AI Usage - 3 to 5 meaningful AI-assisted decisions)  
+| Metadata Field | Specification |
+| :--- | :--- |
+| **Document ID** | `CIPHER-ENG-2026-AI-01` |
+| **Assignment Track** | CipherSchools Engineering Hiring Assignment — Section 6 (AI Usage) |
+| **Author** | Candidate Engineering Team |
+| **Platform** | Low-Level Design (LLD) Practice Studio |
+| **Date** | September 2026 |
+| **Status** | Final Release |
 
 ---
 

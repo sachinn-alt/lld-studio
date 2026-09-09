@@ -1,72 +1,90 @@
-# Design Note: Architecture & Low-Level Design of the LLD Practice Platform
+# Design Note: Architecture & Low-Level Design (LLD) Specification
 
-**Author:** LLD Practice Platform Team  
-**Date:** September 2026  
-**Assignment:** CipherSchools Engineering Hiring Assignment  
-**Focus:** MVP Definition, Domain Architecture, Design Patterns, Trade-offs & Extensibility  
+| Metadata Field | Document Specification |
+| :--- | :--- |
+| **Document ID** | `CIPHER-ENG-2026-DN-01` |
+| **Assignment Track** | CipherSchools Engineering Hiring Assignment — System & Low-Level Design |
+| **Author** | Candidate Engineering Team |
+| **Submission Status** | Final Publication Release |
+| **Effective Date** | September 2026 |
+| **Architecture Style** | Modular Monolith (Clean Architecture & DDD Principles) |
+| **Target Runtime** | Node.js (v18+) / TypeScript (v5+) / Express / React + Vite |
 
 ---
 
-## 1. Executive Summary & MVP Scope
+## 1. Executive Summary & Architectural Philosophy
 
-The **LLD Practice Platform** is engineered as a focused, modular monolith designed around a single core learner problem: providing objective, rubric-grounded, explainable design feedback that powers iterative improvement.
+The **LLD Practice Platform** is designed as a focused, modular monolith engineered around a single core objective: **empowering software engineers to practice Low-Level Design actively and receive objective, explainable, rubric-grounded feedback across iterative attempts.**
 
-In accordance with good engineering judgment, we deliberately reject bloated peripheral systems (such as multi-tenant authentication, collaborative diagram whiteboards, or distributed microservice orchestration) in favor of deep, cohesive domain modeling.
+> [!IMPORTANT]
+> **Architectural Guiding Principle**: We deliberately prioritize deep, cohesive domain modeling over peripheral operational complexity. Premature microservices, distributed message brokers (Kafka/RabbitMQ), and distributed databases add network failure modes without enhancing the learner's feedback loop. The system is architected as an in-process modular monolith with clean domain seams, allowing async workers to be decoupled effortlessly when traffic demands it.
 
-### 1.1 Scope Boundaries
+---
 
-| Capability | In Scope (MVP) | Out of Scope (Deferred with Rationale) |
+## 2. MVP Scope Boundaries & System Invariants
+
+To guarantee production-grade execution within a focused scope, we established strict architectural boundaries:
+
+| Capability Dimension | In Scope (Production MVP) | Out of Scope (Deferred with Rationale) |
 | :--- | :--- | :--- |
-| **Problem Catalog** | 5 curated LLD problems (Parking Lot, Elevator Dispatcher, Splitwise, Cache System with LRU/LFU/FIFO, API Rate Limiter) with business invariants and rubrics. | Crowdsourced problem creation and uncurated community voting. |
-| **Submission Format** | Structured design specification (Core Entities, Responsibilities, Interfaces, Patterns, Trade-offs). | Heavy free-form graphical drag-and-drop vector drawing tools. |
-| **Visual & Code Bridge** | Dynamic Live UML class diagram synthesis and multi-language boilerplate code generator (Java, TypeScript, C++). | Full in-browser compiler sandbox or multi-language execution runtime. |
-| **Evaluation Engine** | Hybrid two-stage evaluation: Deterministic Rule Evaluator + Rubric Evaluator with concrete evidence citations. | Heavy distributed message broker (Kafka/RabbitMQ); modular in-process state transitions are sufficient for MVP. |
-| **Feedback Model** | Multi-dimensional rubric feedback citing concrete evidence, design concerns, and remedies. | Vague, single-prompt subjective AI grading ("Looks good! 85/100"). |
-| **Attempt Tracking** | Versioned attempt history ($A_1, A_2, \dots$) with rubric delta comparison and score progression. | Social leaderboards, public user profiles, or gamification badges. |
+| **Problem Catalog** | **5 Curated Scenarios**: Multi-Floor Parking Lot, Multi-Car Elevator Dispatcher, Splitwise Expense Sharing, In-Memory Cache with Pluggable Eviction, and Distributed API Rate Limiter. | Crowdsourced open problem creation and community upvoting (prevents low-quality, uncurated problems). |
+| **Submission Format** | **Structured OOD Articulation**: Typed domain entities, single responsibilities, polymorphic interfaces, design patterns with justifications, and trade-off invariants. | Freeform drag-and-drop vector drawing canvas (distracts from object-oriented contract design). |
+| **Visual & Code Bridge** | **Real-Time Live UML**: Dynamic visual class node rendering + Mermaid.js syntax synthesis.<br>**Polyglot Code Exporter**: Starter boilerplate in **Java 17+**, **TypeScript**, and **C++20**. | In-browser compiler execution sandbox (evaluates design contracts, not multi-language compiler toolchains). |
+| **Evaluation Engine** | **Two-Stage Hybrid Engine**: Instant deterministic structural verification (<50ms) followed by rubric-grounded semantic evaluation with evidence citations. | Heavy distributed message brokers (Kafka); event-driven in-process state machine is sufficient for MVP scale. |
+| **Feedback Model** | **Orthogonal Rubric Citations**: Criterion scores citing candidate classes, specific design smells/concerns, and actionable refactoring remedies. | Unconstrained single-prompt AI scores ("Looks good! 85/100") without evidence anchors. |
+| **Attempt Tracking** | **Versioned History & Delta**: Audit trail of attempts ($A_1 \rightarrow A_2 \rightarrow \dots$) with mathematical rubric score progression deltas. | Public social leaderboards, user followings, or gamification badges. |
 
 ---
 
-## 2. Learner User Flow
+## 3. Learner User Flow & Lifecycle State Machine
 
-The platform guides the learner through an active feedback-driven state cycle:
+The learner workflow is modeled as a deterministic, resilient state cycle preventing data loss and duplicate executions:
 
 ```mermaid
 stateDiagram-v2
     [*] --> BrowseCatalog: Learner arrives
-    BrowseCatalog --> SelectProblem: Selects curated LLD problem (e.g. Parking Lot, Cache)
+    BrowseCatalog --> SelectProblem: Selects curated LLD problem (e.g., Parking Lot, Cache)
     SelectProblem --> CreateAttempt: Initiates Attempt #1 (DRAFT)
     CreateAttempt --> DraftDesign: Fills structured specification
     DraftDesign --> InspectUML: Real-time Live UML diagram preview
     DraftDesign --> ExportCode: Generate Java / TypeScript / C++ skeleton
     DraftDesign --> SubmitSolution: Submits design
     
-    state "Attempt Lifecycle" as AttemptLifecycle {
-        SubmitSolution --> SUBMITTED: Persist payload safely
-        SUBMITTED --> EVALUATING: Trigger evaluation pipeline
+    state "Attempt Lifecycle State Machine" as AttemptLifecycle {
+        SubmitSolution --> SUBMITTED: Persist payload safely in repository
+        SUBMITTED --> EVALUATING: Transition state & trigger evaluation pipeline
         EVALUATING --> COMPLETED: Deterministic + Rubric Success
-        EVALUATING --> FAILED: Evaluator timeout / error
-        FAILED --> EVALUATING: Retry evaluation
+        EVALUATING --> FAILED: Timeout or evaluator exception
+        FAILED --> EVALUATING: Retry evaluation without re-typing
     }
     
-    COMPLETED --> ReviewFeedback: Inspect Evidence, Concerns, Suggestions
+    COMPLETED --> ReviewFeedback: Inspect Evidence, Concerns & Suggestions
     ReviewFeedback --> ViewHistory: Compare with prior attempts & rubric delta
     ReviewFeedback --> CreateAttempt: Try Again (Initiates Attempt #2)
 ```
 
+### State Machine Transition Rules
+1. $\text{DRAFT} \longrightarrow \text{SUBMITTED}$: Triggered by learner submission. Payload is validated and saved immediately.
+2. $\text{SUBMITTED} \longrightarrow \text{EVALUATING}$: Evaluation pipeline is engaged. Duplicate submissions are idempotently rejected.
+3. $\text{EVALUATING} \longrightarrow \text{COMPLETED}$: Both deterministic checks and rubric evaluations successfully resolve. Feedback entity is attached.
+4. $\text{EVALUATING} \longrightarrow \text{FAILED}$: Handled gracefully on timeout or unhandled exception. The submission payload remains safely persisted for 1-click retry.
+
 ---
 
-## 3. Domain Model & Object-Oriented Design
+## 4. Domain Model & Object-Oriented Architecture
 
-The core domain adheres strictly to SOLID principles, DDD (Domain-Driven Design) layering, and clean separation between domain entities, value objects, and evaluation strategies.
+The domain layer enforces Domain-Driven Design (DDD) encapsulation, high cohesion, and strict compliance with the **SOLID principles**.
 
-### 3.1 Domain Class Diagram
+### 4.1 Domain Class Diagram
 
 ```mermaid
 classDiagram
+    direction TB
+
     class Problem {
         +ProblemId id
         +String title
-        +String description
+        +String summary
         +List~String~ functionalRequirements
         +List~String~ nonFunctionalRequirements
         +Rubric rubric
@@ -99,53 +117,47 @@ classDiagram
         FAILED
     }
 
-    class Submission {
+    class Submission~T~ {
         +SubmissionId id
-        +SubmissionFormat format
-        +ISubmissionPayload payload
+        +T payload
         +DateTime submittedAt
-        +getPayload() ISubmissionPayload
     }
 
     class ISubmissionPayload {
         <<interface>>
+        +SubmissionFormat format
         +validate() ValidationResult
-        +getSummary() String
+        +toEvaluationContext() String
     }
 
     class StructuredDesignPayload {
-        +List~EntitySpec~ entities
-        +List~InterfaceSpec~ interfaces
-        +List~PatternSpec~ designPatterns
+        +List~EntityItem~ entities
+        +List~InterfaceItem~ interfaces
+        +List~PatternItem~ designPatterns
         +String tradeOffsAndAssumptions
+        +String codeSnippetOrPseudocode
         +validate() ValidationResult
-        +getSummary() String
+        +toEvaluationContext() String
     }
 
     class Rubric {
-        +RubricId id
-        +List~RubricCriterion~ criteria
-        +getMaxScore() int
-    }
-
-    class RubricCriterion {
         +String id
-        +String name
-        +String description
-        +int weight
-        +int maxScore
+        +List~RubricCriterion~ criteria
+        +calculateScore(List~CriterionEvaluation~ evals) int
     }
 
     class Feedback {
-        +FeedbackId id
+        +String id
+        +AttemptId attemptId
         +int overallScore
         +List~CriterionEvaluation~ evaluations
-        +String summary
+        +String summaryNarrative
         +DateTime evaluatedAt
     }
 
     class CriterionEvaluation {
         +String criterionId
+        +String criterionName
         +int score
         +int maxScore
         +String evidence
@@ -156,20 +168,20 @@ classDiagram
 
     class IEvaluator {
         <<interface>>
-        +evaluate(Submission submission, Rubric rubric) Promise~EvaluationResult~
+        +evaluate(Submission sub, Rubric rub) Promise~EvaluationResult~
     }
 
     class DeterministicRuleEvaluator {
-        +evaluate(Submission submission, Rubric rubric) Promise~EvaluationResult~
+        +evaluate(Submission sub, Rubric rub) Promise~EvaluationResult~
     }
 
     class SemanticRubricEvaluator {
-        +evaluate(Submission submission, Rubric rubric) Promise~EvaluationResult~
+        +evaluate(Submission sub, Rubric rub) Promise~EvaluationResult~
     }
 
     class CompositeEvaluator {
         -List~IEvaluator~ evaluators
-        +evaluate(Submission submission, Rubric rubric) Promise~EvaluationResult~
+        +evaluate(Submission sub, Rubric rub) Promise~EvaluationResult~
     }
 
     Problem "1" *-- "1" Rubric : specifies
@@ -185,129 +197,125 @@ classDiagram
     CompositeEvaluator "1" o-- "many" IEvaluator : coordinates
 ```
 
----
+### 4.2 SOLID Responsibility Analysis
 
-## 4. Key Responsibilities of Domain Classes
-
-| Class / Interface | Primary Responsibility | Justification & SOLID Adherence |
+| Class / Component | Primary Responsibility | Architectural Justification & SOLID Mapping |
 | :--- | :--- | :--- |
-| **`Problem`** | Encapsulates problem statements, constraints, and rubric definitions. | **Single Responsibility Principle (SRP)**: Holds domain problem invariants; does not know about user attempts or evaluation mechanics. |
-| **`Attempt`** | Manages the lifecycle state machine of a learner's solution effort. | **Encapsulation & State Invariants**: Enforces legal state transitions (`DRAFT` $\rightarrow$ `SUBMITTED` $\rightarrow$ `EVALUATING` $\rightarrow$ `COMPLETED`). Guarantees an attempt cannot be marked completed without valid feedback. |
-| **`Submission<T>`** | Immutably captures what the learner submitted at a point in time. | **Open-Closed Principle (OCP)**: Uses generic `ISubmissionPayload` to decouple the attempt from the format of the solution. |
-| **`Rubric` & `RubricCriterion`** | Models the multi-dimensional criteria against which designs are judged. | Decouples grading rules from both problems and evaluators. Rubrics can be versioned or customized per problem type. |
-| **`IEvaluator`** | Strategy contract for evaluating a submission against a rubric. | **Dependency Inversion Principle (DIP)**: Application services depend on the `IEvaluator` abstraction, not concrete AI or rule engines. |
-| **`CompositeEvaluator`** | Coordinates deterministic checks with semantic AI evaluations. | **Composite & Open-Closed Patterns**: Allows chaining any number of evaluators without altering the calling service. |
-
-### 4.1 Visual UML Synthesis & Polyglot Code Generation
-
-To prevent the "passive reading trap" and reinforce the bridge between design thinking and real-world implementation, the platform incorporates dual synthesis engines:
-* **Dynamic Live UML Synthesis**: Translates the learner's declared entities, responsibilities, and interfaces into interactive visual class nodes and standard Mermaid.js class diagrams in real time.
-* **Polyglot Code Exporter**: Automatically translates the structured design specification into strongly typed, compilable boilerplate across **Java** (interfaces, immutability, thread-safe patterns), **TypeScript** (typed interfaces, ES6 classes), and **C++** (abstract base classes, virtual destructors, modern C++20 pointers).
+| **`Problem`** | Encapsulates problem statements, operational constraints, and rubric criteria. | **Single Responsibility Principle (SRP)**: Holds immutable domain specifications; unaware of user attempts or evaluation logic. |
+| **`Attempt`** | Enforces the lifecycle state machine and lifecycle invariants. | **Encapsulation & State Safety**: Guarantees legal transitions (`DRAFT` $\rightarrow$ `SUBMITTED` $\rightarrow$ `EVALUATING` $\rightarrow$ `COMPLETED`). Ensures an attempt cannot complete without feedback. |
+| **`Submission<T>`** | Immutably captures what the learner submitted at a specific timestamp. | **Open-Closed Principle (OCP)**: Decoupled from concrete payload structure via `ISubmissionPayload` generic abstraction. |
+| **`Rubric` & `RubricCriterion`** | Models multi-dimensional grading standards and weighted score calculations. | **High Cohesion**: Isolates grading formulas from evaluator implementations. Rubrics can be versioned independently. |
+| **`IEvaluator`** | Strategy contract for evaluating candidate submissions against rubrics. | **Dependency Inversion Principle (DIP)**: Core application services depend upon `IEvaluator` abstraction, not concrete rule engines. |
+| **`CompositeEvaluator`** | Coordinates deterministic checks with semantic rubric evaluations. | **Composite Pattern & OCP**: Allows chaining multiple evaluators (deterministic, semantic, human review) without modifying client code. |
 
 ---
 
-## 5. Evaluation & Feedback Approach
+## 5. Visual UML Synthesis & Polyglot Code Generation Engine
 
-Evaluation is structured into a two-phase pipeline to maximize reliability and speed while minimizing costs:
+To eliminate the "passive reading trap" and bridge design articulation with real-world implementation, the platform incorporates dual client-side synthesis engines:
 
-```mermaid
-flowchart LR
-    Sub[Learner Submission] --> Comp[Composite Evaluator]
-    
-    subgraph Phase 1: Deterministic Engine (<50ms)
-        Comp --> DET[Deterministic Rule Evaluator]
-        DET --> D1{Schema & Completeness Valid?}
-        D1 -- No --> FailFast[Fail Fast: Highlight Missing Sections]
-        D1 -- Yes --> RuleScore[Calculate Structural Score]
-    end
-    
-    subgraph Phase 2: Semantic Rubric Engine
-        RuleScore --> LLM[Semantic Rubric Evaluator]
-        LLM --> Prompt[Inject Structured Rubric & Evidence Anchor]
-        Prompt --> Parse[Validate Structured JSON Response]
-    end
-    
-    Parse --> Merge[Synthesize Overall Feedback]
-    FailFast --> Merge
-    Merge --> Res[Return Unified Feedback]
+### 5.1 Real-Time Live UML Synthesis
+* **Visual Class Cards**: Dynamically translates user-defined entities, responsibilities, and polymorphic interfaces into interactive visual class nodes.
+* **Mermaid.js Code Generator**: Automatically formats class hierarchies and interface relationships into standard Mermaid syntax:
+  ```mermaid
+  classDiagram
+      direction TB
+      class IParkingStrategy {
+          <<interface>>
+          +findSpot()
+      }
+      class ParkingLot {
+          +String id
+          +executeAction()
+      }
+      ParkingLot ..> IParkingStrategy : delegates to
+  ```
+* **Clipboard Integration**: 1-click export of Mermaid source code for external documentation.
+
+### 5.2 Polyglot Starter Code Exporter
+Generates strongly typed, compilable boilerplate stubs based on the candidate's active design specification:
+* **Java 17+**: Complete interface contracts, domain classes with immutable properties, design pattern annotations, and `Main` verification runner.
+* **TypeScript**: ES6 exported interfaces, strongly typed class models with constructors, and execution harness.
+* **C++20**: Abstract base classes with pure virtual methods, virtual destructors, modern memory management (`std::unique_ptr`), and RAII idioms.
+
+---
+
+## 6. Hybrid Two-Stage Evaluation Pipeline
+
+Evaluation is split into two distinct decoupled stages to maximize speed, eliminate LLM token waste, and ensure deterministic reliability:
+
+```
+┌───────────────────────────────────────────────────────────────────────────┐
+│                    TWO-STAGE HYBRID EVALUATION PIPELINE                   │
+├─────────────────────────────────────┬─────────────────────────────────────┤
+│ STAGE 1: Deterministic Engine       │ STAGE 2: Semantic Rubric Engine     │
+│ (<50ms, Rule-Based)                 │ (Evidence-Grounded)                 │
+├─────────────────────────────────────┼─────────────────────────────────────┤
+│ • Validates mandatory schema fields │ • Evaluates 4 orthogonal dimensions │
+│ • Verifies entity count & depth     │ • Cites explicit class names        │
+│ • Checks interface method signatures│ • Flags concrete design smells      │
+│ • Fast-fails incomplete submissions │ • Recommends actionable refactors   │
+└─────────────────────────────────────┴─────────────────────────────────────┘
 ```
 
-### 5.1 Deterministic Checks
-* **Section Coverage**: Ensures all mandatory components (Entities, Responsibilities, Interfaces, Pattern justifications, Assumptions) are present.
-* **Relationship Integrity**: Verifies that referenced interfaces and classes are actually declared.
-* **Minimum Elaboration Depth**: Flags placeholder or one-word descriptions before wasting LLM tokens.
+### 6.1 Feedback Contract Schema
+Every evaluation generates a structured feedback payload adhering to a rigorous interface:
+```typescript
+export interface CriterionEvaluation {
+  readonly criterionId: string;     // Matches rubric dimension ID
+  readonly criterionName: string;   // e.g. "Single Responsibility & Cohesion"
+  readonly score: number;           // 1 to 5 rating
+  readonly maxScore: number;        // Typically 5
+  readonly evidence: string;        // Explicit quote: "ParkingLot defines calculateFee()"
+  readonly concern: string;         // Design smell: "Violates SRP by mixing fees & spots"
+  readonly suggestion: string;      // Actionable remedy: "Extract IFeeCalculator strategy"
+  readonly confidence: number;      // Evaluator confidence (0.0 to 1.0)
+}
+```
 
-### 5.2 Semantic Checks (Rubric-Grounded)
-The semantic engine does not ask the LLM *"Is this design good?"* (which results in inconsistent grades). Instead, it evaluates 4 strict orthogonal dimensions:
-1. **Domain Modeling & Completeness**: Did the design capture all core entities required by the problem?
-2. **Single Responsibility & Cohesion (SRP)**: Are class responsibilities focused, or do "God objects" exist?
-3. **Coupling & Extensibility (OCP / DIP)**: Are algorithms and behaviors abstracted behind interfaces (e.g. Strategy/Factory patterns)?
-4. **Trade-offs & Constraints**: Did the candidate explain why they chose their design and what trade-offs were accepted?
-
-### 5.3 Feedback Shape
-Every criterion evaluation adheres to a strict contract:
-* `criterionId`: Identifier matching the problem rubric.
-* `score`: 1 to 5.
-* `evidence`: Explicit citation of class/method names from the candidate's submission.
-* `concern`: Concrete failure scenario or design smell.
-* `suggestion`: Specific pattern or refactoring to address in the next attempt.
-* `confidence`: Evaluator certainty score (0.0 – 1.0).
+### 6.2 Weighted Score Calculation
+The overall composite score is derived from criterion weights:
+$$\text{Overall Score} = \sum_{i=1}^{K} \left( \frac{\text{Weight}_i}{100} \times \frac{\text{Score}_i}{\text{MaxScore}_i} \times 100 \right)$$
 
 ---
 
-## 6. The Two Change Tests
+## 7. Extensibility Validation: The Two Change Tests
 
-A critical test of domain design is how gracefully it absorbs change. Our architecture was specifically tested against the two scenarios highlighted in the hiring brief:
+A critical test of object-oriented design is how gracefully it absorbs requirement changes without architectural regression. The system was validated against the two change tests specified in the brief:
 
-### Change Test A: Supporting a New Submission Format (e.g., UML Class Diagram or Code)
-* **The Challenge**: Today the platform accepts structured markdown/text. Tomorrow it must support a UML Class Diagram or raw Java/TypeScript code.
-* **How Our Architecture Absorbs It**:
-  1. We defined `ISubmissionPayload`:
-     ```typescript
-     export interface ISubmissionPayload {
-       format: SubmissionFormat; // 'STRUCTURED_TEXT' | 'UML_DIAGRAM' | 'CODE'
-       validate(): ValidationResult;
-       toEvaluationContext(): string;
-     }
-     ```
-  2. To support UML diagrams, we implement `UmlDiagramPayload implements ISubmissionPayload` containing diagram nodes/edges or Mermaid/PlantUML syntax.
-  3. `Attempt`, `PracticeService`, and the database schema remain **completely unchanged**. The `Submission` entity wraps any payload adhering to `ISubmissionPayload`.
+### Change Test A: New Submission Formats (e.g., Class Diagram or Raw Code)
+* **Requirement**: Extend the platform from text/markdown submissions to graphical class diagrams or raw source code.
+* **Architectural Solution**: Encapsulated behind `ISubmissionPayload`:
+  ```typescript
+  export interface ISubmissionPayload {
+    readonly format: SubmissionFormat;
+    validate(): ValidationResult;
+    toEvaluationContext(): string;
+  }
+  ```
+* **Proof of Extensibility**: We can create `UmlDiagramPayload implements ISubmissionPayload` or `CodeSubmissionPayload implements ISubmissionPayload`. `Attempt`, `PracticeService`, and storage interfaces require **zero modifications** (verified in `tests/domain/SubmissionPayload.test.ts`).
 
-### Change Test B: Adding a New Evaluator (e.g., Static AST Linter or Human Review)
-* **The Challenge**: Today feedback is generated by automated rules and an LLM. Tomorrow we add a rule-based AST linter or asynchronous human peer review.
-* **How Our Architecture Absorbs It**:
-  1. Evaluators implement `IEvaluator`:
-     ```typescript
-     export interface IEvaluator {
-       readonly name: string;
-       evaluate(submission: Submission, rubric: Rubric): Promise<EvaluationResult>;
-     }
-     ```
-  2. To add human review, we simply create `HumanReviewEvaluator implements IEvaluator`.
-  3. We register `new HumanReviewEvaluator()` into `CompositeEvaluator`:
-     ```typescript
-     const evaluator = new CompositeEvaluator([
-       new DeterministicRuleEvaluator(),
-       new SemanticRubricEvaluator(),
-       new HumanReviewEvaluator() // <-- Plugs in seamlessly!
-     ]);
-     ```
-  4. The practice flow (`PracticeService.submitSolution()`) does not change by a single line. It simply invokes `this.evaluator.evaluate()`.
+### Change Test B: Pluggable Evaluators (e.g., Static AST Linter or Human Review)
+* **Requirement**: Introduce human peer review or an AST static code linter alongside automated checks.
+* **Architectural Solution**: Encapsulated behind `IEvaluator` Strategy and `CompositeEvaluator`:
+  ```typescript
+  export interface IEvaluator {
+    readonly name: string;
+    evaluate(submission: Submission, rubric: Rubric): Promise<EvaluationResult>;
+  }
+  ```
+* **Proof of Extensibility**: To add human review, we instantiate `HumanReviewEvaluator implements IEvaluator` and register it into `new CompositeEvaluator([..., new HumanReviewEvaluator()])`. The application service orchestration remains **100% untouched** (verified in `tests/evaluators/CompositeEvaluator.test.ts`).
 
 ---
 
-## 7. Practical Scale & Architectural Trade-offs
+## 8. Practical Scale Roadmap & Production Evolution
 
-| Decision | Chosen Approach | Alternative Considered | Rationale & Trade-off |
-| :--- | :--- | :--- | :--- |
-| **System Architecture** | **Modular Monolith** | Microservices (Service per feature) | For a practice platform prototype, a clean monolith eliminates network serialization, distributed transactions, and deployment complexity while maintaining strict domain boundaries. |
-| **Evaluation Timing** | **Asynchronous Lifecycle with Immediate Save** | Synchronous blocking HTTP request | LLM evaluation takes 2–5 seconds. Blocking the HTTP connection risks browser timeouts and loses submissions if the network drops. We save the attempt as `SUBMITTED` first, then transition to `EVALUATING` asynchronously. |
-| **State Storage** | **Domain Repository Interface (In-Memory + File Persistence)** | Distributed Database (PostgreSQL / DynamoDB) | Adheres to Dependency Inversion. The repository interface (`IAttemptRepository`) allows switching to a cloud database without touching domain logic, while keeping the prototype zero-setup for reviewers. |
-| **Idempotency & Retries** | **Attempt-Level State Machine** | Uncontrolled client re-requests | If a learner clicks "Submit" twice, the state machine recognizes `SUBMITTED` or `EVALUATING` and rejects duplicate evaluation jobs. If an evaluation fails, the attempt transitions to `FAILED` and can be retried without re-typing. |
+| Architectural Concern | MVP Implementation | Evolution at Scale (50,000 DAU) |
+| :--- | :--- | :--- |
+| **System Topology** | **Modular Monolith**: In-process event handling, zero network serialization. | **Decoupled Evaluation Worker**: Extract evaluation pipeline into async worker pool (AWS ECS / Lambda). |
+| **Messaging & Queues** | **In-Memory Event Dispatcher**: Direct async execution. | **Distributed Queue**: SQS or Redis Streams buffer submission tasks for worker consumption. |
+| **Data Persistence** | **In-Memory Repositories**: Instant setup with clean interfaces (`IProblemRepository`, `IAttemptRepository`). | **Managed PostgreSQL**: Swap repository implementation with Prisma / TypeORM; zero domain code changes. |
+| **Evaluation Engine** | **Deterministic + Rule Evaluator**: 100% local, fast, zero third-party API dependencies. | **Hybrid LLM Pool**: Local deterministic tier with rate-limited, pooled LLM workers for semantic depth. |
 
-### Component Separation Roadmap
-If the platform scales to 50,000 daily active learners, the **first and only component to extract** is the **Evaluation Worker Pool**:
-* The web monolith continues handling problems, attempt management, and submission ingestion.
-* When a submission is saved, a lightweight event (`SubmissionCreatedEvent`) is published to a job queue (e.g., AWS SQS or Redis Streams).
-* Independent evaluation worker nodes consume from the queue, execute `CompositeEvaluator`, and write the resulting `Feedback` back to the database.
-* The domain entities (`Attempt`, `Submission`, `Rubric`, `Feedback`) remain identical.
+> [!TIP]
+> **Summary**: The core domain model (`Attempt`, `Problem`, `Rubric`, `Feedback`, `Submission`) remains identical across all scaling tiers. Only the infrastructure adapters and evaluation worker deployment topology evolve.
