@@ -17,11 +17,12 @@ In accordance with good engineering judgment, we deliberately reject bloated per
 
 | Capability | In Scope (MVP) | Out of Scope (Deferred with Rationale) |
 | :--- | :--- | :--- |
-| **Problem Catalog** | 3 curated LLD problems with business requirements, edge constraints, and tailored rubrics. | Crowdsourced problem creation and community voting. |
-| **Submission Format** | Structured design specification (Core Entities, Responsibilities, Interfaces, Patterns, Trade-offs). | Drag-and-drop visual canvas or multi-compiler execution sandboxes. |
-| **Evaluation Engine** | Hybrid two-stage evaluation: Deterministic Rule Evaluator + Semantic Rubric Evaluator. | Distributed message broker (Kafka/RabbitMQ); in-process event-driven state transitions are sufficient. |
+| **Problem Catalog** | 5 curated LLD problems (Parking Lot, Elevator Dispatcher, Splitwise, Cache System with LRU/LFU/FIFO, API Rate Limiter) with business invariants and rubrics. | Crowdsourced problem creation and uncurated community voting. |
+| **Submission Format** | Structured design specification (Core Entities, Responsibilities, Interfaces, Patterns, Trade-offs). | Heavy free-form graphical drag-and-drop vector drawing tools. |
+| **Visual & Code Bridge** | Dynamic Live UML class diagram synthesis and multi-language boilerplate code generator (Java, TypeScript, C++). | Full in-browser compiler sandbox or multi-language execution runtime. |
+| **Evaluation Engine** | Hybrid two-stage evaluation: Deterministic Rule Evaluator + Rubric Evaluator with concrete evidence citations. | Heavy distributed message broker (Kafka/RabbitMQ); modular in-process state transitions are sufficient for MVP. |
 | **Feedback Model** | Multi-dimensional rubric feedback citing concrete evidence, design concerns, and remedies. | Vague, single-prompt subjective AI grading ("Looks good! 85/100"). |
-| **Attempt Tracking** | Versioned attempt history ($A_1, A_2, \dots$) with rubric delta comparison. | Social leaderboards, public user profiles, or gamification badges. |
+| **Attempt Tracking** | Versioned attempt history ($A_1, A_2, \dots$) with rubric delta comparison and score progression. | Social leaderboards, public user profiles, or gamification badges. |
 
 ---
 
@@ -32,9 +33,11 @@ The platform guides the learner through an active feedback-driven state cycle:
 ```mermaid
 stateDiagram-v2
     [*] --> BrowseCatalog: Learner arrives
-    BrowseCatalog --> SelectProblem: Selects (e.g. Parking Lot)
+    BrowseCatalog --> SelectProblem: Selects curated LLD problem (e.g. Parking Lot, Cache)
     SelectProblem --> CreateAttempt: Initiates Attempt #1 (DRAFT)
     CreateAttempt --> DraftDesign: Fills structured specification
+    DraftDesign --> InspectUML: Real-time Live UML diagram preview
+    DraftDesign --> ExportCode: Generate Java / TypeScript / C++ skeleton
     DraftDesign --> SubmitSolution: Submits design
     
     state "Attempt Lifecycle" as AttemptLifecycle {
@@ -46,8 +49,7 @@ stateDiagram-v2
     }
     
     COMPLETED --> ReviewFeedback: Inspect Evidence, Concerns, Suggestions
-    ReviewFeedback --> ViewHistory: Compare with prior attempts
-    ViewFeedback: Inspect rubric delta
+    ReviewFeedback --> ViewHistory: Compare with prior attempts & rubric delta
     ReviewFeedback --> CreateAttempt: Try Again (Initiates Attempt #2)
 ```
 
@@ -195,6 +197,12 @@ classDiagram
 | **`Rubric` & `RubricCriterion`** | Models the multi-dimensional criteria against which designs are judged. | Decouples grading rules from both problems and evaluators. Rubrics can be versioned or customized per problem type. |
 | **`IEvaluator`** | Strategy contract for evaluating a submission against a rubric. | **Dependency Inversion Principle (DIP)**: Application services depend on the `IEvaluator` abstraction, not concrete AI or rule engines. |
 | **`CompositeEvaluator`** | Coordinates deterministic checks with semantic AI evaluations. | **Composite & Open-Closed Patterns**: Allows chaining any number of evaluators without altering the calling service. |
+
+### 4.1 Visual UML Synthesis & Polyglot Code Generation
+
+To prevent the "passive reading trap" and reinforce the bridge between design thinking and real-world implementation, the platform incorporates dual synthesis engines:
+* **Dynamic Live UML Synthesis**: Translates the learner's declared entities, responsibilities, and interfaces into interactive visual class nodes and standard Mermaid.js class diagrams in real time.
+* **Polyglot Code Exporter**: Automatically translates the structured design specification into strongly typed, compilable boilerplate across **Java** (interfaces, immutability, thread-safe patterns), **TypeScript** (typed interfaces, ES6 classes), and **C++** (abstract base classes, virtual destructors, modern C++20 pointers).
 
 ---
 

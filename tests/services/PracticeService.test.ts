@@ -14,8 +14,16 @@ describe('PracticeService End-to-End Orchestration', () => {
 
   it('should load seeded practice problems', async () => {
     const problems = await service.getProblems();
-    expect(problems.length).toBeGreaterThanOrEqual(3);
+    expect(problems.length).toBe(5);
     expect(problems.some(p => p.id === 'prob-parking-lot')).toBe(true);
+    expect(problems.some(p => p.id === 'prob-elevator-system')).toBe(true);
+    expect(problems.some(p => p.id === 'prob-splitwise')).toBe(true);
+    expect(problems.some(p => p.id === 'prob-cache-system')).toBe(true);
+    expect(problems.some(p => p.id === 'prob-rate-limiter')).toBe(true);
+
+    const cacheProblem = await service.getProblemById('prob-cache-system');
+    expect(cacheProblem).toBeDefined();
+    expect(cacheProblem.rubric.criteria.length).toBe(4);
   });
 
   it('should manage attempt sequence and progress from Draft to Completed', async () => {

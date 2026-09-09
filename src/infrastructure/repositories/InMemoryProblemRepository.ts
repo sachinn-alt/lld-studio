@@ -16,7 +16,15 @@ export class InMemoryProblemRepository implements IProblemRepository {
     try {
       // Find problems.json
       const currentDir = path.dirname(fileURLToPath(import.meta.url));
-      const problemsJsonPath = path.resolve(currentDir, '../../data/problems.json');
+      const possiblePaths = [
+        path.resolve(currentDir, '../../data/problems.json'),
+        path.resolve(currentDir, '../../../src/data/problems.json'),
+        path.resolve(process.cwd(), 'src/data/problems.json')
+      ];
+      let problemsJsonPath = possiblePaths.find(p => fs.existsSync(p));
+      if (!problemsJsonPath) {
+        throw new Error(`Could not locate problems.json in any known locations: ${possiblePaths.join(', ')}`);
+      }
       const rawData = fs.readFileSync(problemsJsonPath, 'utf-8');
       const parsed = JSON.parse(rawData);
 

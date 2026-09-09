@@ -211,5 +211,143 @@
       ],
       "tradeOffsAndAssumptions": "Amounts stored in integer cents to prevent floating point inaccuracies. Debt simplification uses a greedy net-balance min-cash-flow approach."
     }
+  },
+  {
+    "id": "prob-cache-system",
+    "title": "High-Throughput In-Memory Cache with Pluggable Eviction",
+    "difficulty": "Hard",
+    "estimatedTime": "45 mins",
+    "summary": "Design a fast, thread-safe in-memory key-value cache supporting swappable eviction policies (LRU, LFU, FIFO), size boundaries, TTL expiration, and event notifications.",
+    "functionalRequirements": [
+      "Core CRUD Operations: get(K key) and put(K key, V value, Optional<Long> ttlSeconds) operating in O(1) average time complexity.",
+      "Pluggable Eviction: When capacity threshold is reached, automatically evicts items based on configured policy (LRU - Least Recently Used, LFU - Least Frequently Used, FIFO - First In First Out).",
+      "Time-To-Live (TTL): Entries automatically expire and become inaccessible after their TTL duration has elapsed.",
+      "Lifecycle Event Notifications: Emits events (EVICTED, EXPIRED, UPDATED) to registered cache listeners via Observer pattern.",
+      "Thread-Safe Concurrency: Supports concurrent reads and writes without corrupted state or deadlocks."
+    ],
+    "nonFunctionalRequirements": [
+      "Extensibility: Adding a new eviction algorithm (e.g., ARC or 2Q) must not alter the core Cache coordinator (Open-Closed Principle).",
+      "Lock Granularity: Uses segmented or read-write locking to prevent global lock contention under high concurrency.",
+      "Memory Bound: Guaranteed upper limit on memory / entry count to prevent out-of-memory errors."
+    ],
+    "rubric": {
+      "id": "rubric-cache-system",
+      "criteria": [
+        {
+          "id": "eviction-strategy-pattern",
+          "name": "Eviction Strategy & Polymorphism",
+          "description": "Applies Strategy pattern for eviction policies (LRU, LFU, FIFO), cleanly isolating eviction tracking from core cache storage.",
+          "weight": 25,
+          "maxScore": 5
+        },
+        {
+          "id": "data-structure-efficiency",
+          "name": "Data Structure Efficiency & O(1) Access",
+          "description": "Uses optimal auxiliary data structures (e.g. DoublyLinkedList + HashMap for LRU, FrequencyBuckets for LFU) to maintain O(1) complexity.",
+          "weight": 25,
+          "maxScore": 5
+        },
+        {
+          "id": "concurrency-and-thread-safety",
+          "name": "Concurrency & Granular Locking",
+          "description": "Models thread safety effectively (e.g., Segmented locks or ReadWriteLock) avoiding global blocking bottlenecks.",
+          "weight": 25,
+          "maxScore": 5
+        },
+        {
+          "id": "ttl-and-lifecycle-events",
+          "name": "TTL Expiration & Lifecycle Invariants",
+          "description": "Handles active/passive TTL eviction and decouples listener notification using Observer pattern.",
+          "weight": 25,
+          "maxScore": 5
+        }
+      ]
+    },
+    "starterTemplate": {
+      "entities": [
+        { "name": "Cache", "responsibility": "High-level facade coordinating storage, eviction policy, and listeners" },
+        { "name": "CacheEntry", "responsibility": "Encapsulates key, value, creation timestamp, and TTL expiration" },
+        { "name": "DoublyLinkedList", "responsibility": "Maintains constant-time node reordering for LRU eviction order" },
+        { "name": "CacheStats", "responsibility": "Thread-safe tracking of hit rate, miss rate, and eviction counts" }
+      ],
+      "interfaces": [
+        { "name": "IEvictionPolicy", "methods": ["keyAccessed(K key): void", "evict(): K", "clear(): void"] },
+        { "name": "ICacheListener", "methods": ["onEvicted(K key, V value): void", "onExpired(K key): void"] }
+      ],
+      "designPatterns": [
+        { "name": "Strategy Pattern", "justification": "Allows swapping eviction algorithms (LRU, LFU, FIFO) dynamically at runtime without modifying Cache class" },
+        { "name": "Observer Pattern", "justification": "Notifies audit loggers or metric collectors of eviction events without coupling Cache to monitoring services" }
+      ],
+      "tradeOffsAndAssumptions": "Employs lock striping with 16 segments to maximize concurrent throughput. Lazy expiration on get() combined with periodic cleanup daemon."
+    }
+  },
+  {
+    "id": "prob-rate-limiter",
+    "title": "Distributed API Rate Limiter & Throttling Service",
+    "difficulty": "Medium",
+    "estimatedTime": "35 mins",
+    "summary": "Design an extensible API rate limiting service that throttles client requests based on configurable algorithms (Token Bucket, Leaky Bucket, Sliding Window) and client tiers.",
+    "functionalRequirements": [
+      "Rate Limit Evaluation: allowRequest(String clientId, RequestMetadata metadata) checks if an incoming call is allowed or rejected (HTTP 429).",
+      "Multiple Algorithms: Supports Token Bucket, Leaky Bucket, and Sliding Window Counter via Strategy pattern.",
+      "Tiered Configurations: Enforces limits based on client tiers (Free: 60 req/min, Pro: 1,000 req/min, Enterprise: 10,000 req/min).",
+      "Multi-Identifier Resolution: Rate limits by IP address, authenticated User ID, or API Key.",
+      "Rate Limit Headers: Provides client with remaining tokens, reset timestamp, and retry-after seconds."
+    ],
+    "nonFunctionalRequirements": [
+      "Low Latency: Decision time under 1 millisecond so as not to introduce latency overhead in API gateway pipelines.",
+      "Extensibility: Adding a new throttling algorithm must not require modifying the RateLimiter coordinator (Open-Closed Principle).",
+      "Thread Safety & Concurrency: Atomic token replenishment and decrement without race conditions."
+    ],
+    "rubric": {
+      "id": "rubric-rate-limiter",
+      "criteria": [
+        {
+          "id": "rate-limiting-strategy",
+          "name": "Algorithm Strategy & Polymorphism",
+          "description": "Applies Strategy pattern for throttling algorithms (Token Bucket, Leaky Bucket, Sliding Window), allowing runtime algorithm selection.",
+          "weight": 25,
+          "maxScore": 5
+        },
+        {
+          "id": "client-identification-and-tiers",
+          "name": "Client Identification & Tier Configuration",
+          "description": "Decouples client extraction (IP/User/Key) and tier configuration rules from the core rate check logic.",
+          "weight": 25,
+          "maxScore": 5
+        },
+        {
+          "id": "concurrency-and-atomicity",
+          "name": "Concurrency, Atomicity & Race Conditions",
+          "description": "Prevents race conditions in token consumption using atomic operations or thread-safe synchronization.",
+          "weight": 25,
+          "maxScore": 5
+        },
+        {
+          "id": "gateway-integration-tradeoffs",
+          "name": "Gateway Latency, Headers & Trade-offs",
+          "description": "Calculates standard HTTP headers (X-RateLimit-Remaining, Retry-After) and articulates memory vs. accuracy trade-offs.",
+          "weight": 25,
+          "maxScore": 5
+        }
+      ]
+    },
+    "starterTemplate": {
+      "entities": [
+        { "name": "RateLimiter", "responsibility": "Coordinates rule resolution, algorithm execution, and response header generation" },
+        { "name": "ClientProfile", "responsibility": "Holds client identity, assigned tier, and usage history" },
+        { "name": "TierConfig", "responsibility": "Defines capacity and refill rate limits per tier" },
+        { "name": "TokenBucket", "responsibility": "Atomic state tracking available tokens and last refill timestamp" }
+      ],
+      "interfaces": [
+        { "name": "IRateLimitStrategy", "methods": ["isAllowed(String clientKey, int requestedTokens): boolean", "getRemainingTokens(String clientKey): long"] },
+        { "name": "IClientResolver", "methods": ["resolveKey(RequestMetadata request): String"] }
+      ],
+      "designPatterns": [
+        { "name": "Strategy Pattern", "justification": "Encapsulates rate limit algorithms (Token Bucket, Leaky Bucket, Sliding Window) behind a common evaluation contract" },
+        { "name": "Factory Pattern", "justification": "Instantiates the appropriate strategy based on dynamic configuration" }
+      ],
+      "tradeOffsAndAssumptions": "Token Bucket chosen for burst tolerance. In-memory AtomicLong and ConcurrentHashMap used for thread-safe high-speed checks."
+    }
   }
 ]

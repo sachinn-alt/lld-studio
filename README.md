@@ -15,10 +15,11 @@ Unlike Data Structures & Algorithms (where LeetCode evaluates correctness throug
 
 ### The Solution
 This platform solves **one clear learner problem exceptionally well**:
-1. Provides **curated, constraint-rich LLD problems** (e.g., Multi-Floor Parking Lot, Multi-Car Elevator Dispatcher, Splitwise Expense Sharing).
+1. Provides **5 curated, constraint-rich LLD problems** (Multi-Floor Parking Lot, Multi-Car Elevator Dispatcher, Splitwise Expense Sharing, In-Memory Cache with Pluggable Eviction, Distributed API Rate Limiter).
 2. Requires **structured design articulation** (Entities & Responsibilities, Interfaces & Contracts, Design Patterns with Justifications, Trade-offs & Concurrency).
-3. Evaluates solutions through a **two-stage hybrid engine**: fast deterministic checks followed by a semantic rubric evaluation citing **concrete evidence**, **design smells/concerns**, and **actionable refactorings**.
-4. Tracks **attempt history and progression deltas** ($A_1 \rightarrow A_2 \rightarrow A_3$) to foster real, measurable design improvement.
+3. Bridges design to code via **Live Interactive UML Diagrams** and **Multi-Language Boilerplate Export** (Java, TypeScript, C++).
+4. Evaluates solutions through a **two-stage hybrid engine**: fast deterministic checks followed by a semantic rubric evaluation citing **concrete evidence**, **design smells/concerns**, and **actionable refactorings**.
+5. Tracks **attempt history and progression deltas** ($A_1 \rightarrow A_2 \rightarrow A_3$) to foster real, measurable design improvement.
 
 ---
 
@@ -35,7 +36,7 @@ lld-practice-platform/
 │   ├── api/
 │   │   └── routes.ts               # REST API endpoints (Problems, Attempts, Submissions, History)
 │   ├── data/
-│   │   └── problems.json           # 3 Curated LLD problems with rubrics & starter templates
+│   │   └── problems.json           # 5 Curated LLD problems with rubrics & starter templates
 │   ├── domain/
 │   │   ├── entities/
 │   │   │   ├── Attempt.ts          # Finite state machine (DRAFT -> SUBMITTED -> EVALUATING -> COMPLETED)

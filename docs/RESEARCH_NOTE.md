@@ -103,10 +103,13 @@ Rather than attempting to build an all-in-one learning management system or a he
 ```
 
 ### Core Product Principles:
-1. **Curated, Constraint-Rich Problems**: 3–5 representative problems with specific business constraints, forcing learners to think through trade-offs rather than generic templates.
-2. **Structured Submission Model**: Requiring explicit articulation of (a) Core Domain Entities, (b) Interfaces & Contracts, (c) Design Patterns used with justification, and (d) Key Trade-offs.
-3. **Hybrid Evaluation Architecture**:
-   * *Deterministic Phase*: Immediate validation of schema completeness, required entity counts, and structural integrity.
-   * *Semantic Phase*: Structured rubric scoring where every score is accompanied by **Evidence**, **Concern**, and **Remediation Suggestion**.
-4. **Stateful, Resilient Attempt Lifecycle**: Explicit state transitions (`SUBMITTED` $\rightarrow$ `EVALUATING` $\rightarrow$ `COMPLETED` / `FAILED`) ensuring learner submissions are never lost and evaluation can decouple gracefully.
-5. **Evolution-Ready Seams**: Clean domain boundaries allowing the addition of new submission formats (e.g., class diagrams) and new evaluator engines (e.g., static linters, human review) without rewriting the practice flow.
+1. **Curated, Constraint-Rich Problems**: 5 representative, high-frequency LLD problems (Multi-Floor Parking Lot, Multi-Car Elevator Dispatcher, Splitwise Expense Sharing, High-Throughput In-Memory Cache with LRU/LFU/FIFO, and Distributed API Rate Limiter with Token Bucket/Leaky Bucket/Sliding Window) with explicit operational constraints, forcing learners to evaluate trade-offs rather than memorizing static templates.
+2. **Structured Submission Model**: Requiring explicit articulation of (a) Core Domain Entities & Responsibilities (SRP), (b) Interfaces & Contracts (DIP/OCP), (c) Design Patterns used with justification, and (d) Concurrency Invariants & Key Trade-offs.
+3. **Interactive Visual & Implementation Bridge**:
+   * *Live UML Class Diagram*: Dynamically synthesizes the learner's declared entities, contracts, and pattern bindings into visual class-node cards and standard Mermaid.js syntax in real time.
+   * *Multi-Language Code Boilerplate Generator*: Generates production-ready, strongly typed starter code in **Java**, **TypeScript**, and **C++**, bridging the cognitive gap between architectural abstraction and concrete code execution.
+4. **Hybrid Evaluation Architecture**:
+   * *Deterministic Phase*: Immediate (<50ms) validation of schema completeness, required entity counts, interface contracts, and structural integrity.
+   * *Semantic Phase*: Structured rubric scoring where every score is grounded in **Concrete Evidence**, **Specific Design Smells/Concerns**, and **Actionable Remediation Suggestions**.
+5. **Stateful, Resilient Attempt Lifecycle**: Explicit state transitions (`SUBMITTED` $\rightarrow$ `EVALUATING` $\rightarrow$ `COMPLETED` / `FAILED`) ensuring learner submissions are never lost, idempotent against duplicate requests, and easily retried.
+6. **Evolution-Ready Seams**: Clean domain boundaries allowing the addition of new submission formats (e.g., class diagrams, code files) and new evaluator engines (e.g., static linters, peer review) without modifying the core practice orchestration.
