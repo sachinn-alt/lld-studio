@@ -179,4 +179,5 @@ function generatePdfForFile(mdFilename, pdfFilename, title) {
 console.log('Generating publication-grade PDF deliverables...');
 generatePdfForFile('RESEARCH_NOTE.md', 'RESEARCH_NOTE.pdf', 'Research Note: LLD Practice Platform');
 generatePdfForFile('DESIGN_NOTE.md', 'DESIGN_NOTE.pdf', 'Design Note: LLD Practice Platform Architecture');
+generatePdfForFile('README_AI_USAGE.md', 'README_AI_USAGE.pdf', 'README & AI Usage Report: LLD Practice Platform');
 console.log('Done!');
