@@ -1,0 +1,295 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=1.8cm,top=1.8cm,bottom=1.8cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{listings}
+
+% Color Definitions
+\definecolor{primary}{RGB}{30, 64, 175}
+\definecolor{secondary}{RGB}{15, 118, 110}
+\definecolor{boxbg}{RGB}{248, 250, 252}
+\definecolor{boxborder}{RGB}{59, 130, 246}
+\definecolor{codegreen}{rgb}{0.1,0.5,0.2}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.5,0,0.4}
+\definecolor{codebg}{rgb}{0.97,0.98,0.99}
+
+% Listings Style
+\lstdefinestyle{codestyle}{
+    backgroundcolor=\color{codebg},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{primary}\bfseries,
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=none,                    
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    frame=single,
+    rulecolor=\color{boxborder!40}
+}
+\lstset{style=codestyle}
+
+% Section Typography & Spacing
+\titleformat{\section}{\large\bfseries\color{primary}}{}{0em}{}[\vspace{-0.5em}\rule{\textwidth}{0.6pt}\vspace{-0.3em}]
+\titleformat{\subsection}{\normalsize\bfseries\color{secondary}}{}{0em}{}
+\titleformat{\subsubsection}{\small\bfseries\color{primary!80}}{}{0em}{}
+\titlespacing*{\section}{0pt}{10pt}{5pt}
+\titlespacing*{\subsection}{0pt}{6pt}{3pt}
+\titlespacing*{\subsubsection}{0pt}{4pt}{2pt}
+
+\setlist{nosep,leftmargin=1.2em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4.5pt}
+
+\tcbset{
+  colback=boxbg,
+  colframe=boxborder,
+  arc=1mm,
+  left=3mm,
+  right=3mm,
+  top=2.5mm,
+  bottom=2.5mm,
+  boxrule=0.8pt
+}
+
+\begin{document}
+
+% Header Block
+{\LARGE \textbf{\color{primary}Technical Documentation \& AI Usage Report}}\\[0.2em]
+\textbf{Platform Execution Guide, Architectural Invariants, Limitations \& AI Decision Log}\\
+\textit{CipherSchools Engineering Hiring Assignment --- System \& Low-Level Design}\\
+\textit{Author: Candidate Engineering Team \quad$\vert$\quad Repo: \url{https://github.com/sachinn-alt/lld-studio} \quad$\vert$\quad Date: September 2026 \quad$\vert$\quad ID: CIPHER-ENG-2026-DOC-01}
+\vspace{-0.4em}\rule{\textwidth}{1.2pt}\vspace{-0.2em}
+
+\vspace{0.8em}
+{\Large \textbf{\color{secondary}PART I: README \& SYSTEM DOCUMENTATION}}
+\vspace{0.2em}\rule{\textwidth}{0.8pt}
+
+\section{1. Executive Summary \& The Learner Problem}
+
+Unlike Data Structures \& Algorithms (where automated platforms evaluate correctness through deterministic binary assertions), \textbf{Low-Level Design (LLD) practice remains profoundly difficult to evaluate}:
+\begin{itemize}
+  \item \textbf{Multiple Valid Truths}: Two valid architectures for the same problem (e.g., \textit{Parking Lot} or \textit{Elevator Dispatcher}) look completely different depending on scale and trade-offs.
+  \item \textbf{The ``Passive Reading Trap''}: Reading static class diagrams creates a false sense of confidence. When designing from scratch, learners lack mechanisms to detect leaky abstractions, God classes, or tight coupling.
+  \item \textbf{Unconstrained AI Hallucinations}: Prompting generic conversational LLMs (\textit{``Is this a good design?''}) generates sycophantic praise and inconsistent scores without concrete evidence citations.
+\end{itemize}
+
+\subsection{The Platform Solution}
+This platform solves \textbf{one core learner problem exceptionally well}:
+\begin{enumerate}
+  \item \textbf{5 Curated Enterprise Problems}: Multi-Floor Parking Lot, Multi-Car Elevator Dispatcher, Splitwise Expense Sharing, In-Memory Cache with Pluggable Eviction, and Distributed API Rate Limiter.
+  \item \textbf{Structured Design Articulation}: Replaces unstructured freeform text with typed domain inputs: Core Entities (SRP), Interfaces \& Contracts (DIP/OCP), Design Patterns with Justifications, and Concurrency Trade-offs.
+  \item \textbf{Active Visual \& Code Bridge}: Real-time \textbf{Live UML class diagrams} and \textbf{Polyglot Boilerplate Generation} in \textbf{Java 17+}, \textbf{TypeScript}, and \textbf{C++20}.
+  \item \textbf{Two-Stage Hybrid Evaluator}: Instant deterministic rule validation followed by rubric-grounded scoring citing \textbf{concrete evidence}, \textbf{identified design smells}, and \textbf{actionable remediation suggestions}.
+  \item \textbf{Versioned Attempt History \& Progression Deltas}: Explicitly tracks improvement across iterative attempts ($A_1 \rightarrow A_2 \rightarrow A_3$).
+\end{enumerate}
+
+\section{2. Repository \& Deliverables Layout}
+
+\begin{lstlisting}[language=bash]
+lld-practice-platform/
+|-- docs/
+|   |-- RESEARCH_NOTE.tex / .md     # 2-page research note on learner problem & market gaps
+|   |-- DESIGN_NOTE.tex / .md       # Domain architecture, UML diagrams, patterns, trade-offs
+|   `-- README_AI_USAGE.tex / .md   # Consolidated documentation & Section 6 AI report
+|-- src/
+|   |-- api/routes.ts               # REST API endpoints (Problems, Attempts, Submissions)
+|   |-- data/problems.json          # 5 Curated LLD problems with rubrics & starter templates
+|   |-- domain/
+|   |   |-- entities/               # Attempt, Problem, Rubric, Feedback, Submission
+|   |   |-- interfaces/             # ISubmissionPayload, IProblemRepository, IAttemptRepository
+|   |   `-- value-objects/          # AttemptStatus, SubmissionFormat, ValidationResult
+|   |-- evaluators/                 # Deterministic, SemanticRubric, Composite (Strategy Pattern)
+|   |-- infrastructure/             # In-memory repositories implementing domain interfaces
+|   |-- services/PracticeService.ts # Application service orchestrating attempt lifecycles
+|   `-- server.ts                   # Backend entry point (Port 3001)
+|-- frontend/                       # Vite + React practice studio UI (Port 5173)
+|   `-- src/components/             # ProblemCatalog, ProblemWorkspace, LiveUML, CodeExporter
+|-- tests/                          # Automated test suite (12/12 passing via Vitest)
+|   |-- domain/                     # Attempt.test.ts, SubmissionPayload.test.ts (Change Test A)
+|   |-- evaluators/                 # CompositeEvaluator.test.ts (Change Test B)
+|   `-- services/                   # PracticeService.test.ts (Lifecycle & delta progression)
+|-- AI_USAGE.md                     # 4 documented AI-assisted architectural decisions
+`-- README.md                       # Root repository execution guide
+\end{lstlisting}
+
+\section{3. Quick Start \& Verification Instructions}
+
+\subsection{System Prerequisites}
+\begin{itemize}
+  \item \textbf{Node.js}: v18.0.0 or higher (v22.x recommended)
+  \item \textbf{npm}: v9.0.0 or higher
+\end{itemize}
+
+\subsection{Step 1: Install Dependencies}
+\begin{lstlisting}[language=bash]
+# Install backend and development dependencies
+npm install
+
+# Install frontend studio dependencies
+cd frontend && npm install && cd ..
+\end{lstlisting}
+
+\subsection{Step 2: Run Automated Test Suite}
+\begin{lstlisting}[language=bash]
+npm test
+\end{lstlisting}
+\textit{(All 12 automated unit and integration tests execute and pass via Vitest, verifying domain state transitions, evaluators, and extensibility proofs).}
+
+\subsection{Step 3: Compile Production Bundles}
+\begin{lstlisting}[language=bash]
+npm run build
+\end{lstlisting}
+\textit{(Executes \texttt{tsc} for the backend and Vite production build for the frontend studio).}
+
+\subsection{Step 4: Launch Local Development Servers}
+\begin{lstlisting}[language=bash]
+npm run dev
+\end{lstlisting}
+\begin{itemize}
+  \item \textbf{Frontend Practice Studio}: \url{http://localhost:5173}
+  \item \textbf{Backend REST API}: \url{http://localhost:3001}
+  \item \textbf{Health Endpoint}: \url{http://localhost:3001/health}
+\end{itemize}
+
+\section{4. Key Architectural Highlights \& LLD Principles}
+
+\subsection{4.1 Finite State Machine for Attempt Lifecycles}
+Submissions are never processed as a blocking, synchronous HTTP call. The \texttt{Attempt} entity strictly enforces legal state transitions:
+$$\text{DRAFT} \longrightarrow \text{SUBMITTED} \longrightarrow \text{EVALUATING} \longrightarrow \text{COMPLETED} \ (\text{or } \text{FAILED})$$
+\begin{itemize}
+  \item \textbf{Crash Resilience}: The submission payload is persisted immediately as \texttt{SUBMITTED}. If the evaluation service times out or encounters an error, the learner's work is never lost and can be retried with one click.
+  \item \textbf{Idempotency}: Repeated button clicks while in \texttt{EVALUATING} are safely rejected.
+\end{itemize}
+
+\subsection{4.2 The Two Extensibility Change Tests}
+\textbf{Change Test A: New Submission Formats (e.g., UML Diagrams or Code)} \\
+\textit{Design Pattern: Polymorphic Payload Abstraction (\texttt{ISubmissionPayload}).} \\
+Proof: We can introduce \texttt{UmlDiagramPayload} or \texttt{CodeSubmissionPayload} implementing \texttt{ISubmissionPayload}. The \texttt{Attempt} entity, \texttt{PracticeService}, and storage layer require \textbf{zero modifications} (verified in \texttt{tests/domain/SubmissionPayload.test.ts}).
+
+\textbf{Change Test B: Pluggable Evaluators (e.g., Human Review or Static AST Linter)} \\
+\textit{Design Pattern: Strategy Pattern (\texttt{IEvaluator}) and Composite Pattern (\texttt{CompositeEvaluator}).} \\
+Proof: To add peer human review, we create \texttt{HumanReviewEvaluator implements IEvaluator} and register it into \texttt{new CompositeEvaluator([...])}. The practice orchestration flow does not change by a single line (verified in \texttt{tests/evaluators/CompositeEvaluator.test.ts}).
+
+\subsection{4.3 Practical Scale Roadmap}
+In alignment with the assignment's guidance against premature microservices:
+\begin{itemize}
+  \item The current MVP operates as a clean, modular monolith.
+  \item When scaling to 50,000 active users, the \textbf{first and only component to decouple} is the \textbf{Evaluation Worker}:
+    \begin{enumerate}
+      \item The API saves the attempt and publishes an event to an AWS SQS queue or Redis Stream.
+      \item Stateless evaluation workers consume from the queue and run \texttt{CompositeEvaluator}.
+      \item The domain core (\texttt{Attempt}, \texttt{Problem}, \texttt{Rubric}, \texttt{Feedback}) remains identical.
+    \end{enumerate}
+\end{itemize}
+
+\section{5. Scope Limitations \& Engineering Trade-offs}
+\begin{enumerate}
+  \item \textbf{In-Memory Storage Adapters}: State is managed via \texttt{InMemoryProblemRepository} and \texttt{InMemoryAttemptRepository} implementing domain repository interfaces. This ensures zero-setup execution for evaluators while adhering to Dependency Inversion to swap for PostgreSQL/DynamoDB with zero domain changes.
+  \item \textbf{Deterministic \& Local Semantic Evaluation}: Runs 100\% reliably on local machines using fast deterministic rule validation and structured schema matching without requiring third-party API keys.
+  \item \textbf{Focused Domain Scope}: We deliberately avoided multi-tenant auth, user profiles, and payment gateways to keep 100\% focus on deep object-oriented modeling and the learner feedback loop.
+\end{enumerate}
+
+\vspace{1.2em}
+{\Large \textbf{\color{secondary}PART II: AI USAGE REPORT}}
+\vspace{0.2em}\rule{\textwidth}{0.8pt}
+
+\textbf{Assignment Requirement:} Section 6 (AI Usage --- 3 to 5 meaningful AI-assisted decisions) \\
+\textbf{Author:} Candidate Engineering Team \quad$\vert$\quad \textbf{Date:} September 2026
+
+\subsection*{Overview}
+In developing this Low-Level Design Practice Platform, AI tools (Claude, Gemini, ChatGPT) were used as an architectural sounding board and pair programmer. In every interaction, AI suggestions were subjected to rigorous engineering evaluation against the core project objective: \textbf{solving one clear learner problem exceptionally well without unnecessary complexity.}
+
+Below are 4 meaningful architectural decisions highlighting what the AI proposed, what was accepted or rejected, and the engineering rationale.
+
+\section*{Decision 1: System Topology --- Microservices vs. Modular Monolith}
+\begin{itemize}
+  \item \textbf{What the AI Suggested:} The AI initially suggested a distributed microservices topology consisting of 4 independent services: an \texttt{AuthService}, \texttt{ProblemService}, \texttt{SubmissionService}, and an asynchronous \texttt{EvaluationService} communicating via an Apache Kafka message broker with Redis caching.
+  \item \textbf{Our Evaluation:} The suggestion was a classic over-engineering trap. For a focused prototype emphasizing LLD domain modeling, introducing Kafka, Docker Compose orchestration, distributed transactions, and network serialization adds operational fragility without adding any value to the learner's feedback loop.
+  \item \textbf{Decision:} \textbf{REJECTED.}
+  \item \textbf{Engineering Rationale:} We implemented a \textbf{clean, modular monolith} in TypeScript. Domain boundaries are enforced at the module and package level rather than through network boundaries. Domain events run via an in-memory event emitter. We documented a practical scale roadmap showing that the \textit{Evaluation Worker Pool} is the only component that would be extracted if traffic scaled, keeping the MVP zero-config and lightning-fast.
+\end{itemize}
+
+\section*{Decision 2: Evaluation Design --- Single-Prompt Scoring vs. Hybrid Rubric Engine}
+\begin{itemize}
+  \item \textbf{What the AI Suggested:} The AI suggested a simple, all-in-one prompt: \textit{``Analyze the candidate's design and assign an overall score from 1 to 100 with general suggestions for improvement.''}
+  \item \textbf{Our Evaluation:} This approach produces vague, uncalibrated feedback. An LLM without strict constraints exhibits high variance (scoring the same design 65 on one run and 85 on another), praises trivial naming conventions, and provides generic platitudes (\textit{``Consider using more design patterns''}). Furthermore, it wastes expensive tokens evaluating malformed or incomplete submissions.
+  \item \textbf{Decision:} \textbf{REJECTED the single prompt; ACCEPTED a Two-Stage Hybrid Rubric Engine.}
+  \item \textbf{Engineering Rationale:} We split evaluation into two decoupled stages:
+    \begin{enumerate}
+      \item \textbf{Deterministic Rule Evaluator}: Instant ($<50$ms) checks for schema validity, mandatory sections, entity count, and minimum description depth. Fails fast without wasting LLM resources.
+      \item \textbf{Semantic Rubric Evaluator}: Strictly constrained to a fixed JSON schema with orthogonal dimensions (\textit{Single Responsibility}, \textit{Coupling \& Abstraction}, \textit{Requirement Coverage}, \textit{Trade-offs}). Crucially, the model is required to cite \textbf{specific evidence} (class/method names) from the candidate's text alongside every identified concern.
+    \end{enumerate}
+\end{itemize}
+
+\section*{Decision 3: Submission Extensibility (Change Test A) --- Strongly Typed Generic Payload}
+\begin{itemize}
+  \item \textbf{What the AI Suggested:} When designing the \texttt{Submission} class, the AI provided a concrete class containing hardcoded string fields:
+\begin{lstlisting}[language=java]
+// AI Initial Suggestion
+class Submission {
+  entitiesText: string;
+  relationshipsText: string;
+  patternsText: string;
+}
+\end{lstlisting}
+  \item \textbf{Our Evaluation:} While simple, this hardcoding violates the \textbf{Open-Closed Principle (OCP)}. When evaluating the brief's \textbf{Change Test A} (\textit{``Today the learner submits text; later the platform supports a class diagram''}), this structure would force breaking changes across the database schema, domain classes, and evaluation services.
+  \item \textbf{Decision:} \textbf{ACCEPTED refactoring to an \texttt{ISubmissionPayload} abstraction.}
+  \item \textbf{Engineering Rationale:} We refactored \texttt{Submission} to encapsulate an \texttt{ISubmissionPayload} interface:
+\begin{lstlisting}[language=java]
+export interface ISubmissionPayload {
+  readonly format: SubmissionFormat;
+  validate(): ValidationResult;
+  toEvaluationContext(): string;
+}
+
+export class Submission<T extends ISubmissionPayload = ISubmissionPayload> {
+  constructor(
+    public readonly id: SubmissionId,
+    public readonly payload: T,
+    public readonly submittedAt: Date
+  ) {}
+}
+\end{lstlisting}
+  Now, supporting \texttt{UmlDiagramPayload} or \texttt{CodeSubmissionPayload} requires zero modifications to \texttt{Attempt} or \texttt{PracticeService}.
+\end{itemize}
+
+\section*{Decision 4: Submission State Lifecycle --- Synchronous Request vs. Stateful Asynchronous Transition}
+\begin{itemize}
+  \item \textbf{What the AI Suggested:} The AI proposed a standard synchronous REST endpoint:
+\begin{lstlisting}[language=java]
+app.post('/api/attempts/:id/submit', async (req, res) => {
+  const feedback = await evaluator.evaluate(req.body);
+  res.json({ status: 'COMPLETED', feedback });
+});
+\end{lstlisting}
+  \item \textbf{Our Evaluation:} Evaluation can take 2 to 5 seconds depending on latency. A synchronous HTTP request creates multiple failure modes:
+    \begin{enumerate}
+      \item If the user's connection drops or the browser tab closes during the wait, the candidate's work is lost forever.
+      \item If the evaluator times out or throttles, the entire request fails catastrophically.
+      \item Clicking ``Submit'' twice triggers parallel duplicate evaluations.
+    \end{enumerate}
+  \item \textbf{Decision:} \textbf{REJECTED synchronous flow; ACCEPTED stateful asynchronous lifecycle.}
+  \item \textbf{Engineering Rationale:} We introduced an explicit state machine on the \texttt{Attempt} entity:
+  $$\text{DRAFT} \longrightarrow \text{SUBMITTED} \longrightarrow \text{EVALUATING} \longrightarrow \text{COMPLETED} \ (\text{or } \text{FAILED})$$
+  When a candidate clicks submit:
+  (1)~The submission is persisted immediately, and status transitions to \texttt{SUBMITTED}.
+  (2)~The API responds with \texttt{202 Accepted} within 10ms.
+  (3)~Evaluation executes asynchronously. If evaluation fails, the state becomes \texttt{FAILED} with a retry option, ensuring candidate work is never lost.
+\end{itemize}
+
+\end{document}

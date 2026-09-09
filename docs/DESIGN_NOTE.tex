@@ -1,0 +1,292 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=1.8cm,top=1.8cm,bottom=1.8cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{listings}
+
+% Color Definitions
+\definecolor{primary}{RGB}{30, 64, 175}
+\definecolor{secondary}{RGB}{15, 118, 110}
+\definecolor{boxbg}{RGB}{248, 250, 252}
+\definecolor{boxborder}{RGB}{59, 130, 246}
+\definecolor{codegreen}{rgb}{0.1,0.5,0.2}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.5,0,0.4}
+\definecolor{codebg}{rgb}{0.97,0.98,0.99}
+
+% Listings Style
+\lstdefinestyle{codestyle}{
+    backgroundcolor=\color{codebg},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{primary}\bfseries,
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=none,                    
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    frame=single,
+    rulecolor=\color{boxborder!40}
+}
+\lstset{style=codestyle}
+
+% Section Typography & Spacing
+\titleformat{\section}{\large\bfseries\color{primary}}{}{0em}{}[\vspace{-0.5em}\rule{\textwidth}{0.6pt}\vspace{-0.3em}]
+\titleformat{\subsection}{\normalsize\bfseries\color{secondary}}{}{0em}{}
+\titleformat{\subsubsection}{\small\bfseries\color{primary!80}}{}{0em}{}
+\titlespacing*{\section}{0pt}{10pt}{5pt}
+\titlespacing*{\subsection}{0pt}{6pt}{3pt}
+\titlespacing*{\subsubsection}{0pt}{4pt}{2pt}
+
+\setlist{nosep,leftmargin=1.2em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4.5pt}
+
+\tcbset{
+  colback=boxbg,
+  colframe=boxborder,
+  arc=1mm,
+  left=3mm,
+  right=3mm,
+  top=2.5mm,
+  bottom=2.5mm,
+  boxrule=0.8pt
+}
+
+\begin{document}
+
+% Header Block
+{\LARGE \textbf{\color{primary}Design Note: Architecture \& Low-Level Design (LLD) Specification}}\\[0.2em]
+\textbf{CipherSchools Engineering Hiring Assignment --- System \& Low-Level Design}\\
+\textit{Author: Candidate Engineering Team \quad$\vert$\quad Date: September 2026 \quad$\vert$\quad Document ID: CIPHER-ENG-2026-DN-01 \quad$\vert$\quad Architecture: Modular Monolith}
+\vspace{-0.4em}\rule{\textwidth}{1.2pt}\vspace{-0.2em}
+
+\section{1. Executive Summary \& Architectural Philosophy}
+
+The \textbf{LLD Practice Platform} is designed as a focused, modular monolith engineered around a single core objective: \textbf{empowering software engineers to practice Low-Level Design actively and receive objective, explainable, rubric-grounded feedback across iterative attempts.}
+
+\begin{tcolorbox}
+\textbf{Architectural Guiding Principle:} We deliberately prioritize deep, cohesive domain modeling over peripheral operational complexity. Premature microservices, distributed message brokers (Kafka/RabbitMQ), and distributed databases add network failure modes without enhancing the learner's feedback loop. The system is architected as an in-process modular monolith with clean domain seams, allowing async workers to be decoupled effortlessly when traffic demands it.
+\end{tcolorbox}
+
+\section{2. MVP Scope Boundaries \& System Invariants}
+
+To guarantee production-grade execution within a focused scope, we established strict architectural boundaries:
+
+\begin{table}[h!]
+\small
+\centering
+\begin{tabularx}{\textwidth}{l p{5.5cm} X}
+\toprule
+\textbf{Dimension} & \textbf{In Scope (Production MVP)} & \textbf{Out of Scope (Deferred with Rationale)} \\
+\midrule
+\textbf{Problem Catalog} & \textbf{5 Curated Scenarios}: Multi-Floor Parking Lot, Multi-Car Elevator Dispatcher, Splitwise Expense Sharing, In-Memory Cache with Pluggable Eviction, Distributed API Rate Limiter. & Crowdsourced open problem creation and community upvoting (prevents low-quality, uncurated problems). \\
+\addlinespace[3pt]
+\textbf{Submission Format} & \textbf{Structured OOD Articulation}: Typed domain entities, single responsibilities, polymorphic interfaces, design patterns with justifications, and trade-off invariants. & Freeform drag-and-drop vector drawing canvas (distracts from object-oriented contract design). \\
+\addlinespace[3pt]
+\textbf{Visual \& Code Bridge} & \textbf{Real-Time Live UML}: Dynamic visual class node rendering + Mermaid.js syntax synthesis. \newline \textbf{Polyglot Code Exporter}: Starter boilerplate in \textbf{Java 17+}, \textbf{TypeScript}, and \textbf{C++20}. & In-browser compiler execution sandbox (evaluates design contracts, not multi-language compiler toolchains). \\
+\addlinespace[3pt]
+\textbf{Evaluation Engine} & \textbf{Two-Stage Hybrid Engine}: Instant deterministic structural verification ($<50$ms) followed by rubric-grounded semantic evaluation with evidence citations. & Heavy distributed message brokers (Kafka); event-driven in-process state machine is sufficient for MVP scale. \\
+\addlinespace[3pt]
+\textbf{Feedback Model} & \textbf{Orthogonal Rubric Citations}: Criterion scores citing candidate classes, specific design smells/concerns, and actionable refactoring remedies. & Unconstrained single-prompt AI scores (``Looks good! 85/100'') without evidence anchors. \\
+\addlinespace[3pt]
+\textbf{Attempt Tracking} & \textbf{Versioned History \& Delta}: Audit trail of attempts ($A_1 \rightarrow A_2 \rightarrow \dots$) with mathematical rubric score progression deltas. & Public social leaderboards, user followings, or gamification badges. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{3. Learner User Flow \& Lifecycle State Machine}
+
+The learner workflow is modeled as a deterministic, resilient finite state cycle that prevents data loss and duplicate executions:
+
+\begin{center}
+$\text{Browse Catalog} \longrightarrow \text{Select Problem} \longrightarrow \text{Create Attempt (DRAFT)} \longrightarrow \text{Draft Structured Design}$ \\[0.3em]
+$\Big\downarrow$ \\[0.3em]
+$\text{Inspect Live UML / Export Polyglot Boilerplate} \longrightarrow \text{Submit Solution}$ \\[0.3em]
+$\Big\downarrow$ \\[0.3em]
+$\boxed{\text{SUBMITTED}} \xrightarrow{\quad\text{pipeline}\quad} \boxed{\text{EVALUATING}} \xrightarrow{\quad\text{success}\quad} \boxed{\text{COMPLETED}} \longrightarrow \text{Review Evidence \& Delta}$ \\[0.3em]
+$\Big\downarrow \scriptstyle{\text{failure / timeout}}$ \hspace{5.5cm} $\Big\downarrow$ \\[0.3em]
+$\boxed{\text{FAILED}} \xrightarrow[\text{1-click retry}]{} \boxed{\text{EVALUATING}}$ \hspace{2.5cm} $\text{Initiate Attempt } A_{t+1}$
+\end{center}
+
+\subsection{State Machine Transition Rules}
+\begin{enumerate}
+  \item $\text{DRAFT} \longrightarrow \text{SUBMITTED}$: Triggered upon candidate submission. The payload is validated and persisted immediately in storage before evaluation commences.
+  \item $\text{SUBMITTED} \longrightarrow \text{EVALUATING}$: The evaluation pipeline engages. Repeated submissions are rejected idempotently to avoid race conditions.
+  \item $\text{EVALUATING} \longrightarrow \text{COMPLETED}$: Both deterministic structural checks and rubric evaluations successfully resolve. The generated \texttt{Feedback} entity is attached immutably to the attempt.
+  \item $\text{EVALUATING} \longrightarrow \text{FAILED}$: Handled gracefully upon timeout or evaluator exception. The candidate's submission payload remains safely persisted for an immediate 1-click retry.
+\end{enumerate}
+
+\section{4. Domain Model \& Object-Oriented Architecture}
+
+The domain layer enforces Domain-Driven Design (DDD) encapsulation, high cohesion, and strict compliance with the \textbf{SOLID principles}.
+
+\subsection{4.1 Core Domain Entities \& Relationships}
+\begin{itemize}
+  \item \textbf{\texttt{Problem}}: Aggregation root defining requirements, operational constraints, starter template, and grading rubric.
+  \item \textbf{\texttt{Attempt}}: Stateful entity managing the attempt lifecycle ($\text{DRAFT} \rightarrow \text{SUBMITTED} \rightarrow \text{EVALUATING} \rightarrow \text{COMPLETED}$), associated with a specific problem and learner.
+  \item \textbf{\texttt{Submission<T>}}: Generic immutable envelope holding candidate design data conforming to \texttt{ISubmissionPayload}.
+  \item \textbf{\texttt{ISubmissionPayload}}: Polymorphic interface defining validation and evaluation serialization methods.
+  \item \textbf{\texttt{StructuredDesignPayload}}: Implements \texttt{ISubmissionPayload}, encapsulating entities, responsibilities, interfaces, design patterns, and concurrency trade-offs.
+  \item \textbf{\texttt{Rubric}} \& \textbf{\texttt{RubricCriterion}}: Value models defining weighted evaluation dimensions (e.g., SRP, DIP/OCP, Trade-offs).
+  \item \textbf{\texttt{Feedback}} \& \textbf{\texttt{CriterionEvaluation}}: Rich assessment result carrying criterion scores, explicit quotes (evidence), identified anti-patterns (concerns), and remediation guidance (suggestions).
+  \item \textbf{\texttt{IEvaluator}} \& \textbf{\texttt{CompositeEvaluator}}: Strategy and Composite patterns orchestrating deterministic rules and rubric scoring engines.
+\end{itemize}
+
+\subsection{4.2 SOLID Responsibility Analysis}
+
+\begin{table}[h!]
+\small
+\centering
+\begin{tabularx}{\textwidth}{l p{4.2cm} X}
+\toprule
+\textbf{Component} & \textbf{Primary Responsibility} & \textbf{Architectural Justification \& SOLID Mapping} \\
+\midrule
+\textbf{\texttt{Problem}} & Encapsulates problem statements, operational constraints, and rubric criteria. & \textbf{Single Responsibility Principle (SRP)}: Holds immutable domain specifications; unaware of user attempts or evaluation logic. \\
+\addlinespace[3pt]
+\textbf{\texttt{Attempt}} & Enforces the lifecycle state machine and lifecycle invariants. & \textbf{Encapsulation \& State Safety}: Guarantees legal transitions ($\text{DRAFT} \rightarrow \text{SUBMITTED} \rightarrow \text{EVALUATING} \rightarrow \text{COMPLETED}$). Ensures an attempt cannot complete without feedback. \\
+\addlinespace[3pt]
+\textbf{\texttt{Submission<T>}} & Immutably captures what the learner submitted at a specific timestamp. & \textbf{Open-Closed Principle (OCP)}: Decoupled from concrete payload structure via \texttt{ISubmissionPayload} generic abstraction. \\
+\addlinespace[3pt]
+\textbf{\texttt{Rubric} \& \texttt{RubricCriterion}} & Models multi-dimensional grading standards and weighted score calculations. & \textbf{High Cohesion}: Isolates grading formulas from evaluator implementations. Rubrics can be versioned independently. \\
+\addlinespace[3pt]
+\textbf{\texttt{IEvaluator}} & Strategy contract for evaluating candidate submissions against rubrics. & \textbf{Dependency Inversion Principle (DIP)}: Core application services depend upon \texttt{IEvaluator} abstraction, not concrete rule engines. \\
+\addlinespace[3pt]
+\textbf{\texttt{CompositeEvaluator}} & Coordinates deterministic checks with semantic rubric evaluations. & \textbf{Composite Pattern \& OCP}: Allows chaining multiple evaluators (deterministic, semantic, human review) without modifying client code. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{5. Visual UML Synthesis \& Polyglot Code Generation Engine}
+
+To eliminate the ``passive reading trap'' and bridge design articulation with real-world implementation, the platform incorporates dual client-side synthesis engines:
+
+\subsection{5.1 Real-Time Live UML Synthesis}
+\begin{itemize}
+  \item \textbf{Visual Class Cards}: Dynamically translates user-defined entities, responsibilities, and polymorphic interfaces into interactive visual class nodes.
+  \item \textbf{Mermaid.js Code Generator}: Automatically formats class hierarchies and interface relationships into standard Mermaid syntax:
+\begin{lstlisting}[language=java]
+classDiagram
+    direction TB
+    class IParkingStrategy { <<interface>> +findSpot() }
+    class ParkingLot { +String id +executeAction() }
+    ParkingLot ..> IParkingStrategy : delegates to
+\end{lstlisting}
+  \item \textbf{Clipboard Integration}: 1-click export of Mermaid source code for external documentation.
+\end{itemize}
+
+\subsection{5.2 Polyglot Starter Code Exporter}
+Generates strongly typed, compilable boilerplate stubs based on the candidate's active design specification:
+\begin{itemize}
+  \item \textbf{Java 17+}: Complete interface contracts, domain classes with immutable properties, design pattern annotations, and \texttt{Main} verification runner.
+  \item \textbf{TypeScript}: ES6 exported interfaces, strongly typed class models with constructors, and execution harness.
+  \item \textbf{C++20}: Abstract base classes with pure virtual methods, virtual destructors, modern memory management (\texttt{std::unique\_ptr}), and RAII idioms.
+\end{itemize}
+
+\section{6. Hybrid Two-Stage Evaluation Pipeline}
+
+Evaluation is split into two distinct decoupled stages to maximize speed, eliminate LLM token waste, and ensure deterministic reliability:
+
+\begin{tcolorbox}
+\textbf{Stage 1: Deterministic Rule Engine ($<50$ms, Rule-Based)}
+\begin{itemize}
+  \item Validates mandatory schema fields and minimum character thresholds.
+  \item Verifies entity count ($\ge 3$ core domain entities required).
+  \item Checks polymorphic interface contracts ($\ge 1$ interface definition required).
+  \item Fast-fails incomplete submissions before expensive semantic evaluation.
+\end{itemize}
+\vspace{0.4em}\hrule\vspace{0.4em}
+\textbf{Stage 2: Semantic Rubric Engine (Evidence-Grounded)}
+\begin{itemize}
+  \item Evaluates orthogonal dimensions: (1)~Single Responsibility \& Cohesion, (2)~Interface Segregation \& Dependency Inversion, (3)~Design Pattern Suitability, (4)~Concurrency \& Operational Trade-offs.
+  \item Mandatory Evidence Citation: Every criterion evaluation must cite candidate-defined classes and methods.
+  \item Concrete Concerns \& Suggestions: Flags design smells and prescribes refactoring steps.
+\end{itemize}
+\end{tcolorbox}
+
+\subsection{6.1 Feedback Contract Schema}
+\begin{lstlisting}[language=java]
+export interface CriterionEvaluation {
+  readonly criterionId: string;     // Matches rubric dimension ID
+  readonly criterionName: string;   // e.g. "Single Responsibility & Cohesion"
+  readonly score: number;           // 1 to 5 rating
+  readonly maxScore: number;        // Typically 5
+  readonly evidence: string;        // Explicit quote: "ParkingLot defines calculateFee()"
+  readonly concern: string;         // Design smell: "Violates SRP by mixing fees & spots"
+  readonly suggestion: string;      // Actionable remedy: "Extract IFeeCalculator strategy"
+  readonly confidence: number;      // Evaluator confidence (0.0 to 1.0)
+}
+\end{lstlisting}
+
+\subsection{6.2 Weighted Composite Score Formula}
+$$\text{Overall Score} = \sum_{i=1}^{K} \left( \frac{\text{Weight}_i}{100} \times \frac{\text{Score}_i}{\text{MaxScore}_i} \times 100 \right)$$
+
+\section{7. Extensibility Validation: The Two Change Tests}
+
+A critical test of object-oriented design is how gracefully it absorbs requirement changes without architectural regression. The system was validated against the two change tests specified in the assignment brief:
+
+\subsection{Change Test A: New Submission Formats (e.g., Class Diagram or Raw Code)}
+\begin{itemize}
+  \item \textbf{Requirement}: Extend the platform from structured text submissions to graphical class diagrams or raw source code.
+  \item \textbf{Architectural Solution}: Encapsulated behind the \texttt{ISubmissionPayload} abstraction:
+\begin{lstlisting}[language=java]
+export interface ISubmissionPayload {
+  readonly format: SubmissionFormat;
+  validate(): ValidationResult;
+  toEvaluationContext(): string;
+}
+\end{lstlisting}
+  \item \textbf{Proof of Extensibility}: We can create \texttt{UmlDiagramPayload implements ISubmissionPayload} or \texttt{CodeSubmissionPayload implements ISubmissionPayload}. \texttt{Attempt}, \texttt{PracticeService}, and storage interfaces require \textbf{zero modifications} (verified in \texttt{tests/domain/SubmissionPayload.test.ts}).
+\end{itemize}
+
+\subsection{Change Test B: Pluggable Evaluators (e.g., Static AST Linter or Human Review)}
+\begin{itemize}
+  \item \textbf{Requirement}: Introduce human peer review or an AST static code linter alongside automated checks.
+  \item \textbf{Architectural Solution}: Encapsulated behind \texttt{IEvaluator} Strategy and \texttt{CompositeEvaluator}:
+\begin{lstlisting}[language=java]
+export interface IEvaluator {
+  readonly name: string;
+  evaluate(submission: Submission, rubric: Rubric): Promise<EvaluationResult>;
+}
+\end{lstlisting}
+  \item \textbf{Proof of Extensibility}: To add human review, we instantiate \texttt{HumanReviewEvaluator implements IEvaluator} and register it into \texttt{new CompositeEvaluator([..., new HumanReviewEvaluator()])}. The application service orchestration remains \textbf{100\% untouched} (verified in \texttt{tests/evaluators/CompositeEvaluator.test.ts}).
+\end{itemize}
+
+\section{8. Practical Scale Roadmap \& Production Evolution}
+
+\begin{table}[h!]
+\small
+\centering
+\begin{tabularx}{\textwidth}{l p{5.5cm} X}
+\toprule
+\textbf{Architectural Concern} & \textbf{MVP Implementation} & \textbf{Evolution at Scale (50,000 DAU)} \\
+\midrule
+\textbf{System Topology} & \textbf{Modular Monolith}: In-process event handling, zero network serialization. & \textbf{Decoupled Evaluation Worker}: Extract evaluation pipeline into async worker pool (AWS ECS / Lambda). \\
+\addlinespace[3pt]
+\textbf{Messaging \& Queues} & \textbf{In-Memory Event Dispatcher}: Direct async execution. & \textbf{Distributed Queue}: SQS or Redis Streams buffer submission tasks for worker consumption. \\
+\addlinespace[3pt]
+\textbf{Data Persistence} & \textbf{In-Memory Repositories}: Instant setup with clean interfaces (\texttt{IProblemRepository}, \texttt{IAttemptRepository}). & \textbf{Managed PostgreSQL}: Swap repository implementation with Prisma / TypeORM; zero domain code changes. \\
+\addlinespace[3pt]
+\textbf{Evaluation Engine} & \textbf{Deterministic + Rule Evaluator}: 100\% local, fast, zero third-party API dependencies. & \textbf{Hybrid LLM Pool}: Local deterministic tier with rate-limited, pooled LLM workers for semantic depth. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{tcolorbox}
+\textbf{Architecture Summary:} The core domain model (\texttt{Attempt}, \texttt{Problem}, \texttt{Rubric}, \texttt{Feedback}, \texttt{Submission}) remains identical across all scaling tiers. Only the infrastructure adapters and evaluation worker deployment topology evolve.
+\end{tcolorbox}
+
+\end{document}
