@@ -1,14 +1,7 @@
 # Design Note: Architecture & Low-Level Design (LLD) Specification
 
-| Metadata Field | Document Specification |
-| :--- | :--- |
-| **Document ID** | `CIPHER-ENG-2026-DN-01` |
-| **Assignment Track** | CipherSchools Engineering Hiring Assignment — System & Low-Level Design |
-| **Author** | Candidate Engineering Team |
-| **Submission Status** | Final Publication Release |
-| **Effective Date** | September 2026 |
-| **Architecture Style** | Modular Monolith (Clean Architecture & DDD Principles) |
-| **Target Runtime** | Node.js (v18+) / TypeScript (v5+) / Express / React + Vite |
+**CipherSchools Engineering Hiring Assignment — System & Low-Level Design**  
+*Author: Candidate Engineering Team | Date: September 2026 | Document ID: CIPHER-ENG-2026-DN-01 | Architecture: Modular Monolith*
 
 ---
 
@@ -16,8 +9,7 @@
 
 The **LLD Practice Platform** is designed as a focused, modular monolith engineered around a single core objective: **empowering software engineers to practice Low-Level Design actively and receive objective, explainable, rubric-grounded feedback across iterative attempts.**
 
-> [!IMPORTANT]
-> **Architectural Guiding Principle**: We deliberately prioritize deep, cohesive domain modeling over peripheral operational complexity. Premature microservices, distributed message brokers (Kafka/RabbitMQ), and distributed databases add network failure modes without enhancing the learner's feedback loop. The system is architected as an in-process modular monolith with clean domain seams, allowing async workers to be decoupled effortlessly when traffic demands it.
+> **Architectural Guiding Principle:** We deliberately prioritize deep, cohesive domain modeling over peripheral operational complexity. Premature microservices, distributed message brokers (Kafka/RabbitMQ), and distributed databases add network failure modes without enhancing the learner's feedback loop. The system is architected as an in-process modular monolith with clean domain seams, allowing async workers to be decoupled effortlessly when traffic demands it.
 
 ---
 
@@ -317,5 +309,4 @@ A critical test of object-oriented design is how gracefully it absorbs requireme
 | **Data Persistence** | **In-Memory Repositories**: Instant setup with clean interfaces (`IProblemRepository`, `IAttemptRepository`). | **Managed PostgreSQL**: Swap repository implementation with Prisma / TypeORM; zero domain code changes. |
 | **Evaluation Engine** | **Deterministic + Rule Evaluator**: 100% local, fast, zero third-party API dependencies. | **Hybrid LLM Pool**: Local deterministic tier with rate-limited, pooled LLM workers for semantic depth. |
 
-> [!TIP]
-> **Summary**: The core domain model (`Attempt`, `Problem`, `Rubric`, `Feedback`, `Submission`) remains identical across all scaling tiers. Only the infrastructure adapters and evaluation worker deployment topology evolve.
+> **Architecture Summary:** The core domain model (`Attempt`, `Problem`, `Rubric`, `Feedback`, `Submission`) remains identical across all scaling tiers. Only the infrastructure adapters and evaluation worker deployment topology evolve.

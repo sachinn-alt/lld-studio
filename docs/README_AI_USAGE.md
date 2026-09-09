@@ -1,14 +1,8 @@
 # Technical Documentation & AI Usage Report
 ## Platform Execution Guide, Architectural Invariants, Limitations & AI Decision Log
 
-| Metadata Field | Specification |
-| :--- | :--- |
-| **Document ID** | `CIPHER-ENG-2026-DOC-01` |
-| **Assignment Track** | CipherSchools Engineering Hiring Assignment — System & Low-Level Design |
-| **Author** | Candidate Engineering Team |
-| **Repository URL** | https://github.com/sachinn-alt/lld-studio |
-| **Effective Date** | September 2026 |
-| **Deliverable Type** | Consolidated README & Section 6 AI Usage Report |
+**CipherSchools Engineering Hiring Assignment — System & Low-Level Design**  
+*Author: Candidate Engineering Team | Repository: https://github.com/sachinn-alt/lld-studio | Date: September 2026 | Document ID: CIPHER-ENG-2026-DOC-01*
 
 ---
 

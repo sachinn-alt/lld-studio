@@ -1,13 +1,7 @@
 # AI Usage Report: Architectural Decisions & Engineering Judgment
 
-| Metadata Field | Specification |
-| :--- | :--- |
-| **Document ID** | `CIPHER-ENG-2026-AI-01` |
-| **Assignment Track** | CipherSchools Engineering Hiring Assignment — Section 6 (AI Usage) |
-| **Author** | Candidate Engineering Team |
-| **Platform** | Low-Level Design (LLD) Practice Studio |
-| **Date** | September 2026 |
-| **Status** | Final Release |
+**CipherSchools Engineering Hiring Assignment — Section 6 (AI Usage)**  
+*Author: Candidate Engineering Team | Platform: LLD Practice Studio | Date: September 2026 | Document ID: CIPHER-ENG-2026-AI-01*
 
 ---
 
